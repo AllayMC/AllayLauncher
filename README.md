@@ -18,29 +18,21 @@ WIP
 ## Commands
 
 Start the server (will download the latest stable version of allay if allay haven't been downloaded):
+
 ```bash
 allay
 ```
 
 Available options:
+
 - `-u` Check for update before starting the server
 - `-n` Use nightly build
 
-Update allay:
+An example (check for update and run the server):
+
 ```bash
-allay update
+allay -u -n
 ```
-
-Available options:
-- `-n` Use nightly build
-
-Query the git commit history from the current version to the new version:
-```bash
-allay query
-```
-
-Available options:
-- `-n` Query nightly build
 
 ## License
 
