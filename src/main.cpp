@@ -15,7 +15,7 @@ void setup_logger() {
 #ifdef DEBUG
     logging::set_level(spdlog::level::debug);
 #endif
-    logging::set_pattern("[%H:%M:%S.%e] [%^%l%$] %v");
+    logging::set_pattern("[%^%l%$] %v");
 }
 
 bool check_java() {
