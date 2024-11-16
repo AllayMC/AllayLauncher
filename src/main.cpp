@@ -3,15 +3,14 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <spdlog/common.h>
 #include <spdlog/fmt/bundled/color.h>
-#include <spdlog/spdlog.h>
 #include <string>
 
 #include "config.h"
 #include "cpr/api.h"
 #include "util/file.h"
 #include "util/java.h"
+#include "util/progress_bar.h"
 
 
 using namespace allay_launcher;
@@ -75,9 +74,10 @@ auto parse_arguments(int argc, char* argv[]) {
         bool m_use_nightly;
         bool m_run;
     } ret {
-        program.get<bool>("--update"), 
-        program.get<bool>("--nightly"),
-        program.get<bool>("--run")
+        // program.get<bool>("--update"), 
+        // program.get<bool>("--nightly"),
+        // program.get<bool>("--run")
+        true, true, true
     };
 
     // clang-format on
@@ -114,7 +114,6 @@ bool update_allay(bool use_nightly) {
         logging::info("Your allay version is up to date!");
         return true;
     }
-
     logging::info("New version {} found! Starting to update.", new_allay_jar_name);
     std::string download_url = asset["browser_download_url"];
     if (std::filesystem::exists(new_allay_jar_name)) {
@@ -128,17 +127,26 @@ bool update_allay(bool use_nightly) {
         logging::error("Can't create output file.");
         return false;
     }
-    auto download_response = cpr::Download(
+    progresscpp::ProgressBar progress_bar(10000, 70);
+    cpr::cpr_off_t           upload_last       = 0;
+    auto                     download_response = cpr::Download(
         output_file,
         cpr::Url{download_url},
         cpr::ProgressCallback(
-            [&](cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata
+            [&progress_bar](
+                cpr::cpr_off_t download_total,
+                cpr::cpr_off_t download_now,
+                cpr::cpr_off_t upload_total,
+                cpr::cpr_off_t upload_now,
+                intptr_t       userdata
             ) -> bool {
-                spdlog::info("Downloaded {:.3f} / {:.3f} MB.", downloadNow / (1024.0 * 1024.0), downloadTotal / (1024.0 * 1024.0));
+                progress_bar.set_progress((float)download_now / download_total);
+                progress_bar.display(fmt::format("{:.2}/{:.2} MB", download_now / (1024.0 * 1024.0), download_total / (1024.0 * 1024.0)));
                 return true;
             }
         )
     );
+    progress_bar.done(format(fg(color::green), "\u221a"));
     if (download_response.status_code != 200) {
         logging::error("Failed to download {}. Status code: {}.", download_url, download_response.status_code);
         std::filesystem::remove(new_allay_jar_name);
@@ -146,7 +154,7 @@ bool update_allay(bool use_nightly) {
     }
     // Write the new allay jar name after making sure the file is downloaded properly
     allay_launcher::util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
-    logging::info("Allay is successfully updated to {}.", new_allay_jar_name);
+    logging::info("Successfully updated to {}.", new_allay_jar_name);
 
     return true;
 }
@@ -156,8 +164,8 @@ void run_allay() {
 }
 
 int main(int argc, char* argv[]) {
-    logging::info("Allay launcher version: {} ({}).", format(fg(color::green), ALLAY_LAUNCHER_VERSION), format(fg(color::yellow), GIT_COMMIT));
     setup_logger();
+    logging::info("Allay launcher {} ({}).", format(fg(color::green), ALLAY_LAUNCHER_VERSION), format(fg(color::yellow), GIT_COMMIT));
 
     auto args = parse_arguments(argc, argv);
 
