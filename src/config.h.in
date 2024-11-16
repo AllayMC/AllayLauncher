@@ -1,2 +1,4 @@
+#pragma once
+
 #define ALLAY_LAUNCHER_VERSION "${VERSION}"
 #define GIT_COMMIT             "${GIT_COMMIT}"
