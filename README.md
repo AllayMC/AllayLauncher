@@ -26,12 +26,13 @@ allay
 Available options:
 
 - `-u` Check for update before starting the server
-- `-n` Use nightly build
+- `-r` Run allay server
+- `-n` Use nightly build (default)
 
 An example (check for update and run the server):
 
 ```bash
-allay -u -n
+allay -u
 ```
 
 ## License
