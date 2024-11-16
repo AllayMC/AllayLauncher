@@ -8,8 +8,9 @@ add_requires('cpr           1.10.5')
 target('allay')
     set_kind('binary')
     add_files('src/**.cpp')
-    add_headerfiles('src/**.h')
     add_includedirs('src')
+    add_includedirs('build/config')
+    set_version("0.1.0")
 
     add_packages(
         'argparse',
@@ -23,3 +24,6 @@ target('allay')
     
     add_defines('__cpp_lib_expected')
     set_pcxxheader('src/pch.h')
+
+    set_configdir("$(buildir)/config")
+    add_configfiles("src/config.h.in")
