@@ -1,8 +1,15 @@
 #include <argparse/argparse.hpp>
 
+#include "spdlog/common.h"
+#include "spdlog/fmt/bundled/color.h"
+#include "spdlog/spdlog.h"
+
+#include "config.h"
 #include "util/java.h"
 
+
 using namespace allay_launcher;
+using logging::fmt_lib::color;
 
 void setup_logger() {
 #ifdef DEBUG
@@ -14,7 +21,8 @@ void setup_logger() {
 bool check_java() {
     bool is_java_ok = false;
 
-    if (auto version = util::java::installed_version()) {
+    auto version = util::java::installed_version();
+    if (version) {
         Version min_required_version{21, 0, 0};
         if (*version < min_required_version) {
             logging::error("Unsupported java version: {}", static_cast<std::string>(*version));
@@ -31,6 +39,7 @@ bool check_java() {
         return false;
     }
 
+    logging::info("Detected java version: {}", format(fg(color::green), static_cast<std::string>(*version)));
     return is_java_ok;
 }
 
@@ -64,7 +73,7 @@ auto parse_arguments(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-
+    logging::info("Allay launcher version: {} ({})", format(fg(color::green), ALLAY_LAUNCHER_VERSION), format(fg(color::yellow), GIT_COMMIT));
     setup_logger();
 
     if (!check_java()) return -1;
@@ -74,6 +83,7 @@ int main(int argc, char* argv[]) {
     // TODO
 
     if (args.m_update) {}
+
 
     return 0;
 }
