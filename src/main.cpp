@@ -1,15 +1,18 @@
 #include <argparse/argparse.hpp>
-
-#include "spdlog/common.h"
-#include "spdlog/fmt/bundled/color.h"
-#include "spdlog/spdlog.h"
+#include <cpr/cpr.h>
+#include <nlohmann/json.hpp>
+#include <spdlog/common.h>
+#include <spdlog/fmt/bundled/color.h>
+#include <spdlog/spdlog.h>
+#include <string>
 
 #include "config.h"
+#include "cpr/api.h"
 #include "util/java.h"
-
 
 using namespace allay_launcher;
 using logging::fmt_lib::color;
+using nlohmann::json;
 
 void setup_logger() {
 #ifdef DEBUG
@@ -55,7 +58,8 @@ auto parse_arguments(int argc, char* argv[]) {
             .flag();
     program.add_argument("-n", "--nightly")
             .help("Use nightly build")
-            .flag();
+            .flag()
+            .default_value(true);
 
     program.parse_args(argc, argv);
 
@@ -72,18 +76,46 @@ auto parse_arguments(int argc, char* argv[]) {
     return ret;
 }
 
+bool update_allay(bool use_nightly) {
+    std::string   request_url = use_nightly ? "https://api.github.com/repos/AllayMC/Allay/releases/tags/nightly"
+                                            : "https://api.github.com/repos/AllayMC/Allay/releases/latest";
+    cpr::Response response    = cpr::Get(cpr::Url{request_url});
+    json          json        = json::parse(response.text);
+
+    // TODO: check if there is a new version
+
+    if (json["assets"].empty()) {
+        logging::error("Asset not found.");
+        return false;
+    }
+
+    auto&       asset      = json["assets"][0];
+    std::string asset_name = asset["name"];
+    if (!asset_name.starts_with("allay")) {
+        logging::error("Asset name should starts with 'allay'.");
+        return false;
+    }
+
+    std::string download_url = asset["browser_download_url"];
+
+    // TODO: download the file
+
+    return true;
+}
+
 int main(int argc, char* argv[]) {
     logging::info("Allay launcher version: {} ({})", format(fg(color::green), ALLAY_LAUNCHER_VERSION), format(fg(color::yellow), GIT_COMMIT));
     setup_logger();
 
-    if (!check_java()) return -1;
+    if (!check_java()) {
+        return -1;
+    }
 
     auto args = parse_arguments(argc, argv);
 
-    // TODO
-
-    if (args.m_update) {}
-
+    if (args.m_update) {
+        update_allay(args.m_use_nightly);
+    }
 
     return 0;
 }

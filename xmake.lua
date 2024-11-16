@@ -27,3 +27,7 @@ target('allay')
 
     set_configdir("$(buildir)/config")
     add_configfiles("src/config.h.in")
+
+    if is_mode('debug') then 
+        add_defines('DEBUG')
+    end
