@@ -1,21 +1,19 @@
 #include <argparse/argparse.hpp>
-#include <cpr/cpr.h>
-#include <filesystem>
-#include <fstream>
-#include <nlohmann/json.hpp>
+
 #include <spdlog/fmt/bundled/color.h>
-#include <string>
+
+#include <cpr/cpr.h>
 
 #include "config.h"
-#include "cpr/api.h"
+
 #include "util/file.h"
 #include "util/java.h"
 #include "util/progress_bar.h"
 
+#include "github/repo_api.h"
 
 using namespace allay_launcher;
 using logging::fmt_lib::color;
-using nlohmann::json;
 
 void setup_logger() {
 #ifdef DEBUG
@@ -61,8 +59,7 @@ auto parse_arguments(int argc, char* argv[]) {
             .flag();
     program.add_argument("-n", "--nightly")
             .help("Use nightly build")
-            .flag()
-            .default_value(true);
+            .flag();
     program.add_argument("-r", "--run")
             .help("Run allay server")
             .flag();
@@ -74,10 +71,9 @@ auto parse_arguments(int argc, char* argv[]) {
         bool m_use_nightly;
         bool m_run;
     } ret {
-        // program.get<bool>("--update"), 
-        // program.get<bool>("--nightly"),
-        // program.get<bool>("--run")
-        true, true, true
+        program.get<bool>("--update"), 
+        program.get<bool>("--nightly"),
+        program.get<bool>("--run")
     };
 
     // clang-format on
@@ -86,23 +82,29 @@ auto parse_arguments(int argc, char* argv[]) {
 }
 
 bool update_allay(bool use_nightly) {
-    std::string   request_url = use_nightly ? "https://api.github.com/repos/AllayMC/Allay/releases/tags/nightly"
-                                            : "https://api.github.com/repos/AllayMC/Allay/releases/latest";
-    cpr::Response response    = cpr::Get(cpr::Url{request_url});
-    if (response.status_code != 200) {
-        logging::error("Can't connect to {}. Status code: {}", request_url, response.status_code);
-        return false;
+
+    github::RepoApi api("https://api.github.com");
+
+    api.author("AllayMC").repo("Allay");
+
+    auto release = !use_nightly ? api.get_latest_release() : api.get_release_by_tag("nightly");
+
+    if (!release) {
+        logging::error("Something went wrong.");
+        logging::error("{}", github::to_string(release.error()));
+        return -1;
     }
 
-    json json = json::parse(response.text);
-    if (json["assets"].empty()) {
-        // This should never happen in most cases
-        logging::error("Asset not found.");
-        return false;
+    auto& assets = release->get_assets();
+
+    if (assets.size() != 1) {
+        logging::error("Oh no."); // TODO
+        return -1;
     }
 
-    auto&       asset              = json["assets"][0];
-    std::string new_allay_jar_name = asset["name"];
+    auto& asset = assets.front();
+
+    std::string new_allay_jar_name = asset.m_name;
     if (!new_allay_jar_name.starts_with("allay")) {
         // This should never happen in most cases
         logging::error("Asset name should starts with 'allay'.");
@@ -115,7 +117,7 @@ bool update_allay(bool use_nightly) {
         return true;
     }
     logging::info("New version {} found! Starting to update.", new_allay_jar_name);
-    std::string download_url = asset["browser_download_url"];
+    std::string download_url = asset.m_browser_download_url;
     if (std::filesystem::exists(new_allay_jar_name)) {
         // That may because the last time user try to update
         // allay but interrupt the process. Should remove the old
@@ -155,7 +157,7 @@ bool update_allay(bool use_nightly) {
         return false;
     }
     // Write the new allay jar name after making sure the file is downloaded properly
-    allay_launcher::util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
+    util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
     logging::info("Successfully updated to {}.", new_allay_jar_name);
 
     return true;
@@ -166,7 +168,9 @@ void run_allay() {
 }
 
 int main(int argc, char* argv[]) {
+
     setup_logger();
+
     logging::info(
         "Allay launcher {} ({}).",
         format(fg(color::green), ALLAY_LAUNCHER_VERSION),
