@@ -1,0 +1,4 @@
+# A workaround from https://github.com/clangd/clangd/issues/1850#issuecomment-2332356041
+
+CompileFlags:
+    Add: ["-std:latest", "/clang:-std=c++23"]
