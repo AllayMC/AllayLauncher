@@ -31,7 +31,7 @@ bool check_java() {
     if (version) {
         Version min_required_version{21, 0, 0};
         if (*version < min_required_version) {
-            logging::error("Unsupported java version: {}", static_cast<std::string>(*version));
+            logging::error("Unsupported java version: {}", *version);
             logging::error("Please update your java to 21 or higher.");
         } else {
             is_java_ok = true;
@@ -45,7 +45,7 @@ bool check_java() {
         return false;
     }
 
-    logging::info("Detected java version: {}", format(fg(color::green), static_cast<std::string>(*version)));
+    logging::info("Detected java version: {}", format(fg(color::green), "{}", *version));
     return is_java_ok;
 }
 
