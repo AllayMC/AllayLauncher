@@ -141,7 +141,9 @@ bool update_allay(bool use_nightly) {
                 intptr_t       userdata
             ) -> bool {
                 progress_bar.set_progress((float)download_now / download_total);
-                progress_bar.display(fmt::format("{:.2}/{:.2} MB", download_now / (1024.0 * 1024.0), download_total / (1024.0 * 1024.0)));
+                progress_bar.display(
+                    fmt::format("{:.2}/{:.2} MB", download_now / (1024.0 * 1024.0), download_total / (1024.0 * 1024.0))
+                );
                 return true;
             }
         )
@@ -165,7 +167,11 @@ void run_allay() {
 
 int main(int argc, char* argv[]) {
     setup_logger();
-    logging::info("Allay launcher {} ({}).", format(fg(color::green), ALLAY_LAUNCHER_VERSION), format(fg(color::yellow), GIT_COMMIT));
+    logging::info(
+        "Allay launcher {} ({}).",
+        format(fg(color::green), ALLAY_LAUNCHER_VERSION),
+        format(fg(color::yellow), GIT_COMMIT)
+    );
 
     auto args = parse_arguments(argc, argv);
 

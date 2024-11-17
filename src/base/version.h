@@ -18,7 +18,9 @@ struct Version {
 
 } // namespace allay_launcher
 
-constexpr std::ostream& operator<<(std::ostream& os, const allay_launcher::Version& c) { return os << static_cast<std::string>(c); }
+constexpr std::ostream& operator<<(std::ostream& os, const allay_launcher::Version& c) {
+    return os << static_cast<std::string>(c);
+}
 
 template <>
 struct fmt::formatter<allay_launcher::Version> : fmt::ostream_formatter {};
