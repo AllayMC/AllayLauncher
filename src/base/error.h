@@ -17,6 +17,7 @@ constexpr std::string to_string(SimpleError error) {
     case SimpleError::Failed:
         return "Something went wrong.";
     }
+    return "Unknown error.";
 }
 
 constexpr std::string to_string(GetOSJavaVersionError error) {
@@ -30,6 +31,7 @@ constexpr std::string to_string(GetOSJavaVersionError error) {
     case GetOSJavaVersionError::ParseVersionFailed:
         return "Parse java version failed.";
     }
+    return "Unknown error.";
 }
 
 constexpr std::string to_string(CommandExecutionError error) {
@@ -39,6 +41,7 @@ constexpr std::string to_string(CommandExecutionError error) {
     case CommandExecutionError::CreatePipeError:
         return "Cannot create pipe.";
     }
+    return "Unknown error.";
 }
 
 } // namespace error_util

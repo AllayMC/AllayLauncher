@@ -7,6 +7,9 @@
 #include <string>
 #include <string_view>
 
+#include <filesystem>
+#include <fstream>
+
 #include <array>
 
 // C Standard Libraries
