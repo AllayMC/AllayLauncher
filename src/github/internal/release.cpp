@@ -1,6 +1,6 @@
-#include "release.h"
-
 #include <nlohmann/json.hpp>
+
+#include "release.h"
 
 using json = nlohmann::json;
 
