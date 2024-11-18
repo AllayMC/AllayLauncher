@@ -10,6 +10,8 @@ enum class CommandExecutionError { Ok, CreatePipeError };
 
 enum class DownloadFileError { Ok, FileExistsError, UnableToOpenFileError, NetworkError };
 
+enum class UpdateAllayError { Ok, TODOError }; // TODO
+
 namespace error_util {
 
 constexpr std::string to_string(SimpleError error) {
@@ -58,6 +60,11 @@ constexpr std::string to_string(DownloadFileError error) {
         return "Network error.";
     }
     return "Unknown error.";
+}
+
+constexpr std::string to_string(UpdateAllayError error) {
+    // switch (error) {}
+    return "Unknown error";
 }
 
 } // namespace error_util

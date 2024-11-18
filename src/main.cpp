@@ -1,18 +1,9 @@
 #include <argparse/argparse.hpp>
 
-#include <cpr/cpr.h>
-
+#include "allay_server.h"
 #include "config.h"
 
-#include "util/file.h"
-#include "util/java.h"
-#include "util/network.h"
-#include "util/os.h"
 #include "util/string.h"
-
-#include "github/repo_api.h"
-
-#include <spdlog/fmt/bundled/color.h>
 
 using namespace allay_launcher;
 
@@ -23,45 +14,22 @@ void setup_logger() {
     logging::set_pattern("[%^%l%$] %v");
 }
 
-bool check_java() {
-    bool is_java_ok = false;
-
-    auto version = util::java::installed_version();
-    if (version) {
-        Version min_required_version{21, 0, 0};
-        if (*version < min_required_version) {
-            logging::error("Unsupported java version: {}", *version);
-            logging::error("Please update your java to 21 or higher.");
-        } else {
-            is_java_ok = true;
-        }
-    } else {
-        logging::error("Failed to check java version, please make sure if java is installed correctly.");
-    }
-
-    if (!is_java_ok) {
-        logging::error("Check https://docs.allaymc.org/getting-started/installation/#install-java");
-        return false;
-    }
-
-    logging::info("Detected java version: {}", format(fg(fmt::color::green), "{}", *version));
-    return is_java_ok;
-}
-
 auto parse_arguments(int argc, char* argv[]) {
     using namespace argparse;
 
     ArgumentParser program("allay", "0.1.0");
-    program.set_assign_chars("=");
 
-    struct {
+    struct _args {
+        static _args default_value() { return {.m_run = true, .m_update = true, .m_use_nightly = true}; }
+
         bool m_run;
-
         bool m_update;
         bool m_use_nightly;
 
-        std::string m_custom_args_to_java;
+        std::string m_extra_vm_args;
     } args;
+
+    if (argc == 1) return _args::default_value();
 
     // clang-format off
 
@@ -82,74 +50,13 @@ auto parse_arguments(int argc, char* argv[]) {
     
     program.add_argument("-a", "--args")
         .help("Pass arguments to java")
-        .store_into(args.m_custom_args_to_java);
+        .store_into(args.m_extra_vm_args);
 
     program.parse_args(argc, argv);
 
     // clang-format on
 
     return args;
-}
-
-bool update_allay(bool use_nightly) {
-
-    github::RepoApi api("https://api.github.com");
-
-    api.author("AllayMC").repo("Allay");
-
-    auto release = !use_nightly ? api.get_latest_release() : api.get_release_by_tag("nightly");
-
-    if (!release) {
-        logging::error("Something went wrong.");
-        logging::error("{}", github::to_string(release.error()));
-        return false;
-    }
-
-    auto& assets = release->get_assets();
-
-    if (assets.size() != 1) {
-        logging::error("Oh no.");
-        return false;
-    }
-
-    auto& asset = assets.front();
-
-    std::string new_allay_jar_name = asset.m_name;
-    if (!new_allay_jar_name.starts_with("allay")) {
-        // This should never happen in most cases
-        logging::error("Asset name should starts with 'allay'.");
-        return false;
-    }
-
-    auto current_allay_jar_name = util::file::read_file(".current_allay_jar_name");
-    if (new_allay_jar_name == current_allay_jar_name) {
-        logging::info("Your allay version is up to date!");
-        return true;
-    }
-    logging::info("New version {} found! Starting to update.", new_allay_jar_name);
-
-    if (std::filesystem::exists(new_allay_jar_name)) {
-        // That may because the last time user try to update
-        // allay but interrupt the process. We should remove
-        // the old file as we do not know if it is correct
-        std::filesystem::remove(new_allay_jar_name);
-    }
-
-    auto result = util::network::download(asset.m_browser_download_url, new_allay_jar_name);
-    if (!result) {
-        logging::error(error_util::to_string(result.error()));
-        return false;
-    }
-
-    // Write the new allay jar name after making sure the file is downloaded properly
-    util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
-    logging::info("Successfully updated to {}.", new_allay_jar_name);
-
-    return true;
-}
-
-void run_allay(std::string_view extra_args) {
-    util::os::system(fmt::format("java -jar {} {}", extra_args, util::file::read_file(".current_allay_jar_name")));
 }
 
 int main(int argc, char* argv[]) try {
@@ -164,19 +71,24 @@ int main(int argc, char* argv[]) try {
 
     auto args = parse_arguments(argc, argv);
 
-    if (args.m_update && !update_allay(args.m_use_nightly)) {
-        logging::error("Error while updating allay.");
-        return -1;
+    AllayServer server{"."};
+
+    util::string::remove_prefix(args.m_extra_vm_args, "'");
+    util::string::remove_suffix(args.m_extra_vm_args, "'");
+    util::string::remove_prefix(args.m_extra_vm_args, "\"");
+    util::string::remove_suffix(args.m_extra_vm_args, "\"");
+
+    server.set_vm_extra_arguments(args.m_extra_vm_args);
+
+    if (args.m_update) {
+        auto result = server.update(args.m_use_nightly);
+        if (!result) {
+            logging::error(error_util::to_string(result.error()));
+            return -1;
+        }
     }
 
-    if (args.m_run) {
-        if (!check_java()) return -1;
-        util::string::remove_prefix(args.m_custom_args_to_java, "'");
-        util::string::remove_suffix(args.m_custom_args_to_java, "'");
-        util::string::remove_prefix(args.m_custom_args_to_java, "\"");
-        util::string::remove_suffix(args.m_custom_args_to_java, "\"");
-        run_allay(args.m_custom_args_to_java);
-    }
+    if (args.m_run) server.run();
 
     return 0;
 } catch (const std::exception& e) {
