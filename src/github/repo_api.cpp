@@ -9,8 +9,8 @@ namespace allay_launcher::github {
 std::expected<release_list_t, GetReleaseError> RepoApi::get_releases() const {
     auto session = create_session();
 
-    session.SetUrl(build_url() + "/releases");
-    auto response = session.Get();
+    session->SetUrl(build_url() + "/releases");
+    auto response = session->Get();
 
     if (response.status_code == 404) return std::unexpected(GetReleaseError::NotFound);
     if (response.status_code != 200) return std::unexpected(GetReleaseError::NetworkError);
@@ -43,11 +43,11 @@ std::expected<release_t, GetReleaseError> RepoApi::get_latest_release() const {
     return _fetch_release(build_url() + "/releases/latest");
 }
 
-std::expected<release_t, GetReleaseError> RepoApi::_fetch_release(cpr::Url url) const {
+std::expected<release_t, GetReleaseError> RepoApi::_fetch_release(const cpr::Url& url) const {
     auto session = create_session();
 
-    session.SetUrl(url);
-    auto response = session.Get();
+    session->SetUrl(url);
+    auto response = session->Get();
 
     if (response.status_code == 404) return std::unexpected(GetReleaseError::NotFound);
     if (response.status_code != 200) return std::unexpected(GetReleaseError::NetworkError);
