@@ -47,38 +47,29 @@ bool check_java() {
     return is_java_ok;
 }
 
-auto parse_arguments(int argc, char* argv[]) {
+struct Args {
+    bool m_update;
+    bool m_use_nightly;
+    bool m_run;
+};
+
+Args parse_arguments(int argc, char* argv[]) {
+    if (argc == 0) {
+        // Return default args if no arg is provided
+        return Args{true, true, true};
+    }
+
     using namespace argparse;
 
     ArgumentParser program("allay", "0.1.0");
 
-    // clang-format off
-
-    program.add_argument("-u", "--update")
-            .help("Update allay")
-            .flag();
-    program.add_argument("-n", "--nightly")
-            .help("Use nightly build")
-            .flag();
-    program.add_argument("-r", "--run")
-            .help("Run allay server")
-            .flag();
+    program.add_argument("-u", "--update").help("Update allay").flag();
+    program.add_argument("-n", "--nightly").help("Use nightly build").flag();
+    program.add_argument("-r", "--run").help("Run allay server").flag();
 
     program.parse_args(argc, argv);
 
-    struct {
-        bool m_update;
-        bool m_use_nightly;
-        bool m_run;
-    } ret {
-        program.get<bool>("--update"), 
-        program.get<bool>("--nightly"),
-        program.get<bool>("--run")
-    };
-
-    // clang-format on
-
-    return ret;
+    return Args{program.get<bool>("--update"), program.get<bool>("--nightly"), program.get<bool>("--run")};
 }
 
 bool update_allay(bool use_nightly) {
@@ -120,8 +111,8 @@ bool update_allay(bool use_nightly) {
     std::string download_url = asset.m_browser_download_url;
     if (std::filesystem::exists(new_allay_jar_name)) {
         // That may because the last time user try to update
-        // allay but interrupt the process. Should remove the old
-        // file as we do not know if it is correct
+        // allay but interrupt the process. We should remove
+        // the old file as we do not know if it is correct
         std::filesystem::remove(new_allay_jar_name);
     }
     std::ofstream output_file(new_allay_jar_name, std::ios::binary);
