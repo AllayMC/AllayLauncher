@@ -1,11 +1,14 @@
 #include <argparse/argparse.hpp>
 
+#include <cstdlib>
 #include <spdlog/fmt/bundled/color.h>
 
 #include <cpr/cpr.h>
+#include <string>
 
 #include "config.h"
 
+#include "spdlog/spdlog.h"
 #include "util/file.h"
 #include "util/java.h"
 #include "util/progress_bar.h"
@@ -48,15 +51,16 @@ bool check_java() {
 }
 
 struct Args {
-    bool m_update;
-    bool m_use_nightly;
-    bool m_run;
+    bool        m_update;
+    bool        m_use_nightly;
+    bool        m_run;
+    std::string m_java_args;
 };
 
 Args parse_arguments(int argc, char* argv[]) {
-    if (argc == 0) {
+    if (argc == 1) {
         // Return default args if no arg is provided
-        return Args{true, true, true};
+        return Args{true, true, true, ""};
     }
 
     using namespace argparse;
@@ -66,10 +70,16 @@ Args parse_arguments(int argc, char* argv[]) {
     program.add_argument("-u", "--update").help("Update allay").flag();
     program.add_argument("-n", "--nightly").help("Use nightly build").flag();
     program.add_argument("-r", "--run").help("Run allay server").flag();
+    program.add_argument("-a", "--args").help("Pass arguments to java").default_value("");
 
     program.parse_args(argc, argv);
 
-    return Args{program.get<bool>("--update"), program.get<bool>("--nightly"), program.get<bool>("--run")};
+    return Args{
+        program.get<bool>("--update"),
+        program.get<bool>("--nightly"),
+        program.get<bool>("--run"),
+        program.get<std::string>("--args")
+    };
 }
 
 bool update_allay(bool use_nightly) {
@@ -83,14 +93,14 @@ bool update_allay(bool use_nightly) {
     if (!release) {
         logging::error("Something went wrong.");
         logging::error("{}", github::to_string(release.error()));
-        return -1;
+        return false;
     }
 
     auto& assets = release->get_assets();
 
     if (assets.size() != 1) {
-        logging::error("Oh no."); // TODO
-        return -1;
+        logging::error("Oh no.");
+        return false;
     }
 
     auto& asset = assets.front();
@@ -154,8 +164,10 @@ bool update_allay(bool use_nightly) {
     return true;
 }
 
-void run_allay() {
-    // TODO
+void run_allay(const std::string extra_args) {
+    auto cmd = "java -jar " + extra_args + util::file::read_file(".current_allay_jar_name");
+    logging::info("Using java command: " + cmd);
+    system(cmd.c_str());
 }
 
 int main(int argc, char* argv[]) {
@@ -181,8 +193,7 @@ int main(int argc, char* argv[]) {
         if (!check_java()) {
             return 1;
         }
-        run_allay();
+        run_allay(args.m_java_args);
     }
-
     return 0;
 }
