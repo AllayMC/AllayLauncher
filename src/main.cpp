@@ -14,6 +14,7 @@
 #include "util/progress_bar.h"
 
 #include "github/repo_api.h"
+#include "util/string.h"
 
 using namespace allay_launcher;
 using logging::fmt_lib::color;
@@ -70,7 +71,7 @@ Args parse_arguments(int argc, char* argv[]) {
     program.add_argument("-u", "--update").help("Update allay").flag();
     program.add_argument("-n", "--nightly").help("Use nightly build").flag();
     program.add_argument("-r", "--run").help("Run allay server").flag();
-    program.add_argument("-a", "--args").help("Pass arguments to java").default_value("");
+    program.add_argument("-a", "--args").help("Pass arguments to java").default_value(std::string(""));
 
     program.parse_args(argc, argv);
 
@@ -130,7 +131,7 @@ bool update_allay(bool use_nightly) {
         logging::error("Can't create output file.");
         return false;
     }
-    progresscpp::ProgressBar progress_bar(10000, 70);
+    progresscpp::ProgressBar progress_bar(100, 70);
     cpr::cpr_off_t           upload_last       = 0;
     auto                     download_response = cpr::Download(
         output_file,
@@ -165,7 +166,7 @@ bool update_allay(bool use_nightly) {
 }
 
 void run_allay(const std::string extra_args) {
-    auto cmd = "java -jar " + extra_args + util::file::read_file(".current_allay_jar_name");
+    auto cmd = "java -jar " + extra_args + " " + util::file::read_file(".current_allay_jar_name");
     logging::info("Used java command: " + cmd);
     system(cmd.c_str());
     logging::info("Server stopped");
@@ -194,6 +195,8 @@ int main(int argc, char* argv[]) {
         if (!check_java()) {
             return 1;
         }
+        util::string::remove_prefix(args.m_java_args, "\"");
+        util::string::remove_suffix(args.m_java_args, "\"");
         run_allay(args.m_java_args);
     }
     return 0;
