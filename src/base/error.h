@@ -8,6 +8,8 @@ enum class GetOSJavaVersionError { Ok, CommandNotFound, ExecuteCommandFailed, Pa
 
 enum class CommandExecutionError { Ok, CreatePipeError };
 
+enum class DownloadFileError { Ok, FileExistsError, UnableToOpenFileError, NetworkError };
+
 namespace error_util {
 
 constexpr std::string to_string(SimpleError error) {
@@ -40,6 +42,20 @@ constexpr std::string to_string(CommandExecutionError error) {
         return "Everything is ok.";
     case CommandExecutionError::CreatePipeError:
         return "Cannot create pipe.";
+    }
+    return "Unknown error.";
+}
+
+constexpr std::string to_string(DownloadFileError error) {
+    switch (error) {
+    case DownloadFileError::Ok:
+        return "Everything is ok.";
+    case DownloadFileError::FileExistsError:
+        return "Can't create output file.";
+    case DownloadFileError::UnableToOpenFileError:
+        return "Can't open file.";
+    case DownloadFileError::NetworkError:
+        return "Network error.";
     }
     return "Unknown error.";
 }
