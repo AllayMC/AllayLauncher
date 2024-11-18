@@ -177,7 +177,7 @@ void run_allay(std::string_view extra_args) {
     util::os::system(fmt::format("java -jar {} {}", extra_args, util::file::read_file(".current_allay_jar_name")));
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) try {
 
     setup_logger();
 
@@ -204,4 +204,7 @@ int main(int argc, char* argv[]) {
     }
 
     return 0;
+} catch (const std::exception& e) {
+    logging::error(e.what());
+    return -1;
 }
