@@ -17,10 +17,10 @@ WIP
 
 ## Commands
 
-Start the server (will download the latest stable version of allay if allay haven't been downloaded):
+Start the server (will download the latest nightly version of allay if allay haven't been downloaded):
 
 ```bash
-allay
+allay -u -r -n
 ```
 
 Available options:
@@ -28,12 +28,6 @@ Available options:
 - `-u` Check for update before starting the server
 - `-r` Run allay server
 - `-n` Use nightly build (default)
-
-An example (check for update and run the server):
-
-```bash
-allay -u
-```
 
 ## License
 

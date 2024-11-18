@@ -1,6 +1,6 @@
-#include "github/repo_api.h"
-
 #include <nlohmann/json.hpp>
+
+#include "github/repo_api.h"
 
 using json = nlohmann::json;
 
