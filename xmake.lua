@@ -1,9 +1,11 @@
 add_rules('mode.debug', 'mode.release')
 
+add_repositories('allaymc-repo https://github.com/AllayMC/xmake-repo.git')
+
 add_requires('argparse      3.1')
 add_requires('spdlog        1.14.1')
 add_requires('nlohmann_json 3.11.3')
-add_requires('cpr           1.10.5')
+add_requires('cpr           1.11.0')
 
 target('allay')
     set_kind('binary')
@@ -21,8 +23,10 @@ target('allay')
 
     set_languages('c++23')
     set_optimize('smallest')
-    
-    add_defines('__cpp_lib_expected')
+
+    if not is_plat('windows') then -- workaround for clangd-18 bug.
+        add_defines('__cpp_lib_expected')
+    end
     set_pcxxheader('src/pch.h')
 
     set_configdir("$(buildir)/config")

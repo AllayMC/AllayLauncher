@@ -2,9 +2,12 @@
 
 namespace allay_launcher::github {
 
-cpr::Session ApiBase::create_session() const {
+std::shared_ptr<cpr::Session> ApiBase::create_session() const {
     cpr::Session session;
-    return session;
+
+    // TODO: Should we use GetSharedPtrFromThis?
+    //       see: https://github.com/libcpr/cpr/issues/1145
+    return session.shared_from_this();
 }
 
 } // namespace allay_launcher::github

@@ -34,7 +34,7 @@ private:
     std::string m_author;
     std::string m_repo;
 
-    std::expected<release_t, GetReleaseError> _fetch_release(cpr::Url url) const;
+    std::expected<release_t, GetReleaseError> _fetch_release(const cpr::Url& url) const;
 };
 
 } // namespace allay_launcher::github
