@@ -18,7 +18,11 @@ WIP
 ## Commands
 
 Start the server (will download the latest nightly version of allay if allay haven't been downloaded):
+```bash
+allay
+```
 
+This is equal to:
 ```bash
 allay -u -r -n
 ```
@@ -28,6 +32,13 @@ Available options:
 - `-u` Check for update before starting the server
 - `-r` Run allay server
 - `-n` Use nightly build (default)
+- `-a` Pass arguments to java
+
+Start the server with specified maximum memory limit:
+
+```bash
+allay -u -r -n -a "-Xms1G -Xmx4G"
+```
 
 ## License
 
