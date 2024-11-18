@@ -1,20 +1,17 @@
 #include <argparse/argparse.hpp>
 
-#include <cstdlib>
-#include <spdlog/fmt/bundled/color.h>
-
 #include <cpr/cpr.h>
-#include <string>
 
 #include "config.h"
 
-#include "spdlog/spdlog.h"
 #include "util/file.h"
 #include "util/java.h"
+#include "util/os.h"
+#include "util/string.h"
+
 #include "util/progress_bar.h"
 
 #include "github/repo_api.h"
-#include "util/string.h"
 
 using namespace allay_launcher;
 using logging::fmt_lib::color;
@@ -51,36 +48,47 @@ bool check_java() {
     return is_java_ok;
 }
 
-struct Args {
-    bool        m_update;
-    bool        m_use_nightly;
-    bool        m_run;
-    std::string m_java_args;
-};
-
-Args parse_arguments(int argc, char* argv[]) {
-    if (argc == 1) {
-        // Return default args if no arg is provided
-        return Args{true, true, true, ""};
-    }
-
+auto parse_arguments(int argc, char* argv[]) {
     using namespace argparse;
 
     ArgumentParser program("allay", "0.1.0");
+    program.set_assign_chars("=");
 
-    program.add_argument("-u", "--update").help("Update allay").flag();
-    program.add_argument("-n", "--nightly").help("Use nightly build").flag();
-    program.add_argument("-r", "--run").help("Run allay server").flag();
-    program.add_argument("-a", "--args").help("Pass arguments to java").default_value(std::string(""));
+    struct {
+        bool m_run;
+
+        bool m_update;
+        bool m_use_nightly;
+
+        std::string m_custom_args_to_java;
+    } args;
+
+    // clang-format off
+
+    program.add_argument("-u", "--update")
+        .help("Update allay")
+        .flag()
+        .store_into(args.m_update);
+    
+    program.add_argument("-n", "--nightly")
+        .help("Use nightly build")
+        .flag()
+        .store_into(args.m_use_nightly);
+    
+    program.add_argument("-r", "--run")
+        .help("Run allay server")
+        .flag()
+        .store_into(args.m_run);
+    
+    program.add_argument("-a", "--args")
+        .help("Pass arguments to java")
+        .store_into(args.m_custom_args_to_java);
 
     program.parse_args(argc, argv);
 
-    return Args{
-        program.get<bool>("--update"),
-        program.get<bool>("--nightly"),
-        program.get<bool>("--run"),
-        program.get<std::string>("--args")
-    };
+    // clang-format on
+
+    return args;
 }
 
 bool update_allay(bool use_nightly) {
@@ -165,11 +173,8 @@ bool update_allay(bool use_nightly) {
     return true;
 }
 
-void run_allay(const std::string extra_args) {
-    auto cmd = "java -jar " + extra_args + " " + util::file::read_file(".current_allay_jar_name");
-    logging::info("Used java command: " + cmd);
-    system(cmd.c_str());
-    logging::info("Server stopped");
+void run_allay(std::string_view extra_args) {
+    util::os::system(fmt::format("java -jar {} {}", extra_args, util::file::read_file(".current_allay_jar_name")));
 }
 
 int main(int argc, char* argv[]) {
@@ -184,20 +189,19 @@ int main(int argc, char* argv[]) {
 
     auto args = parse_arguments(argc, argv);
 
-    if (args.m_update) {
-        if (!update_allay(args.m_use_nightly)) {
-            logging::error("Error while updating allay.");
-            return 1;
-        }
+    if (args.m_update && !update_allay(args.m_use_nightly)) {
+        logging::error("Error while updating allay.");
+        return -1;
     }
 
     if (args.m_run) {
-        if (!check_java()) {
-            return 1;
-        }
-        util::string::remove_prefix(args.m_java_args, "\"");
-        util::string::remove_suffix(args.m_java_args, "\"");
-        run_allay(args.m_java_args);
+        if (!check_java()) return -1;
+        util::string::remove_prefix(args.m_custom_args_to_java, "'");
+        util::string::remove_suffix(args.m_custom_args_to_java, "'");
+        util::string::remove_prefix(args.m_custom_args_to_java, "\"");
+        util::string::remove_suffix(args.m_custom_args_to_java, "\"");
+        run_allay(args.m_custom_args_to_java);
     }
+
     return 0;
 }
