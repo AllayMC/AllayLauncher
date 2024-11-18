@@ -166,8 +166,9 @@ bool update_allay(bool use_nightly) {
 
 void run_allay(const std::string extra_args) {
     auto cmd = "java -jar " + extra_args + util::file::read_file(".current_allay_jar_name");
-    logging::info("Using java command: " + cmd);
+    logging::info("Used java command: " + cmd);
     system(cmd.c_str());
+    logging::info("Server stopped");
 }
 
 int main(int argc, char* argv[]) {
