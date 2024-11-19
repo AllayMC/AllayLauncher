@@ -23,6 +23,8 @@ target('allay')
 
     if is_plat('windows') then
         add_links('winhttp.lib')
+    else 
+        remove_files("src/**_win32.*")
     end
 
     set_languages('c++23')
