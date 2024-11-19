@@ -6,6 +6,7 @@
 #include "util/os.h"
 
 #include "github/repo_api.h"
+#include <filesystem>
 
 namespace allay_launcher {
 
@@ -61,18 +62,20 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     }
     logging::info("New version {} found! Starting to update.", new_allay_jar_name);
 
-    if (std::filesystem::exists(new_allay_jar_name)) {
-        // That may because the last time user try to update
-        // allay but interrupt the process. We should remove
-        // the old file as we do not know if it is correct
-        std::filesystem::remove(new_allay_jar_name);
-    }
+    auto tmp_file_name = new_allay_jar_name + ".tmp";
+    // That may because the last time user try to update
+    // allay but interrupt the process. We should remove
+    // the old tmp file as we do not know if it is completed
+    allay_launcher::util::file::remove_if_exists(tmp_file_name);
 
-    auto result = util::network::download(asset.m_browser_download_url, new_allay_jar_name);
+    auto result = util::network::download(asset.m_browser_download_url, tmp_file_name);
     if (!result) {
         logging::error(error_util::to_string(result.error()));
+        std::filesystem::remove(tmp_file_name);
         return std::unexpected(UpdateAllayError::TODOError);
     }
+    allay_launcher::util::file::remove_if_exists(new_allay_jar_name);
+    std::filesystem::rename(tmp_file_name, new_allay_jar_name);
 
     // Write the new allay jar name after making sure the file is downloaded properly
     util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
