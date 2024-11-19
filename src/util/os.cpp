@@ -2,8 +2,6 @@
 
 #include "internal/popen.h"
 
-#include <cstdio>
-
 namespace allay_launcher::util::os {
 
 using namespace internal;

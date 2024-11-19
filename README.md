@@ -4,8 +4,9 @@ The launcher for [Allay](https://github.com/AllayMC/Allay) that aims to be small
 
 ## Features
 
-- [ ] Manage Allay
-- [ ] Webhook support for auto restart
+- [x] Detect java status
+- [x] Manage Allay
+- [x] Discover system proxy setting automatically
 
 ## Installation
 
@@ -33,11 +34,17 @@ Available options:
 - `-r` Run allay server
 - `-n` Use nightly build (default)
 - `-a` Pass arguments to java
+- `-d` Use deamon mode, which the launcher will restart the server after server stopped
 
 Start the server with specified maximum memory limit:
 
 ```bash
 allay -u -r -n -a "-Xms1G -Xmx4G"
+```
+
+Start the server, and will restart the server if server crashed:
+```bash
+allay -u -r -n -d
 ```
 
 ## License
