@@ -47,6 +47,11 @@ Start the server, and will restart the server if server crashed:
 allay -u -r -n -d
 ```
 
+Start the server, but do not check for update:
+```bash
+allay -r
+```
+
 ## License
 
 Copyright **:copyright: 2023-2024 AllayMC**, all rights reserved.
