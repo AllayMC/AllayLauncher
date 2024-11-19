@@ -1,6 +1,6 @@
 # AllayLauncher
 
-Launcher of [Allay](https://github.com/AllayMC/Allay) which aims to be small and ready out of the box.
+The launcher for [Allay](https://github.com/AllayMC/Allay) that aims to be small, fast and ready out of the box⚡
 
 ## Features
 
