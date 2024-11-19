@@ -25,14 +25,18 @@ target('allay')
         add_links('winhttp.lib')
     else 
         remove_files("src/**_win32.*")
+        -- workaround for clangd-18 bug.
+        add_defines('__cpp_lib_expected')
+    end
+
+    if is_plat("linux") then
+        set_symbols("hidden")
+        set_strip("all")
     end
 
     set_languages('c++23')
     set_optimize('smallest')
 
-    if not is_plat('windows') then -- workaround for clangd-18 bug.
-        add_defines('__cpp_lib_expected')
-    end
     set_pcxxheader('src/pch.h')
 
     set_configdir("$(buildir)/config")
