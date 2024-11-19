@@ -1,7 +1,6 @@
 #include "util/os.h"
 #include "util/string.h"
 
-#ifdef _WIN32
 #include <windows.h>
 #include <winhttp.h>
 
@@ -36,4 +35,3 @@ std::expected<SystemProxyInfo, SimpleError> configured_proxy_info() {
 }
 
 } // namespace allay_launcher::util::os
-#endif
