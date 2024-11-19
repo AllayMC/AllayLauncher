@@ -33,6 +33,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: allay-launcher-windows-x64-${{ github.sha }}
+          name: allay-launcher-windows-x64
           path: |
             build/windows/x64/release
