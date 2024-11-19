@@ -10,7 +10,7 @@ enum class CommandExecutionError { Ok, CreatePipeError };
 
 enum class DownloadFileError { Ok, FileExistsError, UnableToOpenFileError, NetworkError };
 
-enum class UpdateAllayError { Ok, TODOError }; // TODO
+enum class UpdateAllayError { Ok, GetReleaseError, WrongAssertCount, WrongFileName, DownloadFileError }; // TODO
 
 namespace error_util {
 
@@ -21,7 +21,7 @@ constexpr std::string to_string(SimpleError error) {
     case SimpleError::Failed:
         return "Something went wrong.";
     }
-    return "Unknown error.";
+    return "SimpleError: Unknown error.";
 }
 
 constexpr std::string to_string(GetOSJavaVersionError error) {
@@ -35,7 +35,7 @@ constexpr std::string to_string(GetOSJavaVersionError error) {
     case GetOSJavaVersionError::ParseVersionFailed:
         return "Parse java version failed.";
     }
-    return "Unknown error.";
+    return "GetOSJavaVersionError: Unknown error.";
 }
 
 constexpr std::string to_string(CommandExecutionError error) {
@@ -45,7 +45,7 @@ constexpr std::string to_string(CommandExecutionError error) {
     case CommandExecutionError::CreatePipeError:
         return "Cannot create pipe.";
     }
-    return "Unknown error.";
+    return "CommandExecutionError: Unknown error.";
 }
 
 constexpr std::string to_string(DownloadFileError error) {
@@ -59,12 +59,23 @@ constexpr std::string to_string(DownloadFileError error) {
     case DownloadFileError::NetworkError:
         return "Network error.";
     }
-    return "Unknown error.";
+    return "DownloadFileError: Unknown error.";
 }
 
 constexpr std::string to_string(UpdateAllayError error) {
-    // switch (error) {}
-    return "Unknown error";
+    switch (error) {
+    case UpdateAllayError::Ok:
+        return "Everything is ok.";
+    case UpdateAllayError::GetReleaseError:
+        return "Error while getting release information.";
+    case UpdateAllayError::WrongAssertCount:
+        return "Wrong assert count error.";
+    case UpdateAllayError::WrongFileName:
+        return "Wrong assert file name.";
+    case UpdateAllayError::DownloadFileError:
+        return "Error while downloading file.";
+    };
+    return "UpdateAllayError: Unknown error.";
 }
 
 } // namespace error_util
