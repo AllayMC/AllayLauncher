@@ -1,25 +1,34 @@
 #include "allay_server.h"
 
+#include "spdlog/spdlog.h"
 #include "util/file.h"
 #include "util/java.h"
 #include "util/network.h"
 #include "util/os.h"
 
 #include "github/repo_api.h"
+#include <chrono>
 #include <filesystem>
+#include <thread>
 
 namespace allay_launcher {
 
-void AllayServer::run() {
+void AllayServer::run(bool deamon) {
     if (!_check_java()) return;
 
-    util::os::system(
-        fmt::format("java -jar {} {}", m_vm_extra_arguments, util::file::read_file(".current_allay_jar_name"))
-    );
+    do {
+        auto cmd =
+            fmt::format("java -jar {} {}", m_vm_extra_arguments, util::file::read_file(".current_allay_jar_name"));
+        logging::info("Used command: {}", cmd);
+        util::os::system(cmd);
+        if (deamon) {
+            logging::info("Deamon mode is enabled, server will be restarted in 5 seconds. Use Ctrl+C to interrupt.");
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    } while (deamon);
 }
 
 std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
-
     github::RepoApi api("https://api.github.com");
 
     // clang-format off
@@ -68,10 +77,9 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     // the old tmp file as we do not know if it is completed
     allay_launcher::util::file::remove_if_exists(tmp_file_name);
 
-    auto result = util::network::download(asset.m_browser_download_url, tmp_file_name);
+    auto result = util::network::download(*api.create_session(), asset.m_browser_download_url, tmp_file_name);
     if (!result) {
         logging::error(error_util::to_string(result.error()));
-        std::filesystem::remove(tmp_file_name);
         return std::unexpected(UpdateAllayError::TODOError);
     }
     allay_launcher::util::file::remove_if_exists(new_allay_jar_name);
@@ -80,6 +88,8 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     // Write the new allay jar name after making sure the file is downloaded properly
     util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
     logging::info("Successfully updated to {}.", new_allay_jar_name);
+    // Delete the old jar file
+    std::filesystem::remove(current_allay_jar_name);
 
     return {};
 }

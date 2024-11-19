@@ -41,4 +41,8 @@ std::vector<std::string> split(std::string_view str, std::string_view delimiter)
     return tokens;
 }
 
+#ifdef _WIN32
+std::string from_wstring(const std::wstring& wstr) { return std::filesystem::path(wstr).string(); }
+#endif
+
 } // namespace allay_launcher::util::string

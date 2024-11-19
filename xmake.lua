@@ -21,6 +21,10 @@ target('allay')
         'cpr'
     )
 
+    if is_plat('windows') then
+        add_links('winhttp.lib')
+    end
+
     set_languages('c++23')
     set_optimize('smallest')
 

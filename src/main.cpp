@@ -5,6 +5,8 @@
 
 #include "util/string.h"
 
+#include "util/os.h"
+
 using namespace allay_launcher;
 
 void setup_logger() {
@@ -25,6 +27,7 @@ auto parse_arguments(int argc, char* argv[]) {
         bool m_run;
         bool m_update;
         bool m_use_nightly;
+        bool m_deamon;
 
         std::string m_extra_vm_args;
     } args;
@@ -47,6 +50,11 @@ auto parse_arguments(int argc, char* argv[]) {
         .help("Run allay server")
         .flag()
         .store_into(args.m_run);
+
+    program.add_argument("-d", "--deamon")
+        .help("Use deamon mode, which the launcher will restart the server after server stopped.")
+        .flag()
+        .store_into(args.m_deamon);
     
     program.add_argument("-a", "--args")
         .help("Pass arguments to java")
@@ -88,7 +96,9 @@ int main(int argc, char* argv[]) try {
         }
     }
 
-    if (args.m_run) server.run();
+    if (args.m_run) {
+        server.run(args.m_deamon);
+    }
 
     return 0;
 } catch (const std::exception& e) {
