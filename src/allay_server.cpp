@@ -13,19 +13,12 @@
 
 namespace allay_launcher {
 
-void AllayServer::run(bool deamon) {
+void AllayServer::run() {
     if (!_check_java()) return;
 
-    do {
-        auto cmd =
-            fmt::format("java -jar {} {}", m_vm_extra_arguments, util::file::read_file(".current_allay_jar_name"));
-        logging::info("Used command: {}", cmd);
-        util::os::system(cmd);
-        if (deamon) {
-            logging::info("Deamon mode is enabled, server will be restarted in 5 seconds. Use Ctrl+C to interrupt.");
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-        }
-    } while (deamon);
+    auto cmd = fmt::format("java -jar {} {}", m_vm_extra_arguments, util::file::read_file(".current_allay_jar_name"));
+    logging::info("Used command: {}", cmd);
+    util::os::system(cmd);
 }
 
 std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
@@ -43,16 +36,15 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     // clang-format on
 
     if (!release) {
-        logging::error("Something went wrong.");
         logging::error("{}", github::to_string(release.error()));
-        return std::unexpected(UpdateAllayError::TODOError);
+        return std::unexpected(UpdateAllayError::GetReleaseError);
     }
 
     auto& assets = release->get_assets();
 
     if (assets.size() != 1) {
-        logging::error("Oh no.");
-        return std::unexpected(UpdateAllayError::TODOError);
+        logging::error("Wrong assert count which should be one.");
+        return std::unexpected(UpdateAllayError::WrongAssertCount);
     }
 
     auto& asset = assets.front();
@@ -61,13 +53,13 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     if (!new_allay_jar_name.starts_with("allay")) {
         // This should never happen in most cases
         logging::error("Asset name should starts with 'allay'.");
-        return std::unexpected(UpdateAllayError::TODOError);
+        return std::unexpected(UpdateAllayError::WrongFileName);
     }
 
     auto current_allay_jar_name = util::file::read_file(".current_allay_jar_name");
     if (new_allay_jar_name == current_allay_jar_name) {
         logging::info("Your allay version is up to date!");
-        return std::unexpected(UpdateAllayError::TODOError);
+        return {};
     }
     logging::info("New version {} found! Starting to update.", new_allay_jar_name);
 
@@ -80,7 +72,7 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     auto result = util::network::download(*api.create_session(), asset.m_browser_download_url, tmp_file_name);
     if (!result) {
         logging::error(error_util::to_string(result.error()));
-        return std::unexpected(UpdateAllayError::TODOError);
+        return std::unexpected(UpdateAllayError::DownloadFileError);
     }
     allay_launcher::util::file::remove_if_exists(new_allay_jar_name);
     std::filesystem::rename(tmp_file_name, new_allay_jar_name);

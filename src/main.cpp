@@ -3,6 +3,7 @@
 #include "allay_server.h"
 #include "config.h"
 
+#include "spdlog/spdlog.h"
 #include "util/string.h"
 
 #include "util/os.h"
@@ -88,17 +89,26 @@ int main(int argc, char* argv[]) try {
 
     server.set_vm_extra_arguments(args.m_extra_vm_args);
 
-    if (args.m_update) {
-        auto result = server.update(args.m_use_nightly);
-        if (!result) {
-            logging::error(error_util::to_string(result.error()));
-            return -1;
+    do {
+        if (args.m_update) {
+            auto result = server.update(args.m_use_nightly);
+            if (!result) {
+                logging::error(error_util::to_string(result.error()));
+                return -1;
+            }
         }
-    }
 
-    if (args.m_run) {
-        server.run(args.m_deamon);
-    }
+        if (args.m_run) {
+            server.run();
+        }
+
+        args.m_deamon = args.m_deamon && args.m_run;
+        if (args.m_deamon) {
+            logging::info("Deamon mode is enabled, server will be restarted in 5 seconds. Use Ctrl+C to interrupt.");
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            logging::info("Restart the server...");
+        }
+    } while (args.m_deamon);
 
     return 0;
 } catch (const std::exception& e) {
