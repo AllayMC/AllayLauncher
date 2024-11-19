@@ -16,7 +16,6 @@ std::expected<void, DownloadFileError> download(std::string_view download_url, s
     }
 
     progresscpp::ProgressBar progress_bar(100, 70);
-    cpr::cpr_off_t           upload_last       = 0;
     auto                     download_response = cpr::Download(
         save_file,
         cpr::Url{download_url},

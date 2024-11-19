@@ -38,4 +38,10 @@ std::string read_file(const std::string&& filename) {
     }
 }
 
+bool remove_if_exists(std::string_view filename) {
+    if (std::filesystem::exists(filename)) {
+        return std::filesystem::remove(filename);
+    }
+    return false;
+}
 } // namespace allay_launcher::util::file
