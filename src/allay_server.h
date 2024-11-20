@@ -19,8 +19,6 @@ private:
     std::string m_path; // TODO
 
     std::string m_vm_extra_arguments;
-
-    bool _check_java();
 };
 
 } // namespace allay_launcher
