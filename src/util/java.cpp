@@ -40,4 +40,29 @@ std::expected<Version, GetOSJavaVersionError> installed_version() {
     }
 }
 
+bool check_java() {
+    bool is_java_ok = false;
+
+    auto version = util::java::installed_version();
+    if (version) {
+        Version min_required_version{21, 0, 0};
+        if (*version < min_required_version) {
+            logging::error("Unsupported java version: {}", *version);
+            logging::error("Please update your java to 21 or higher.");
+        } else {
+            is_java_ok = true;
+        }
+    } else {
+        logging::error("Failed to check java version, please make sure if java is installed correctly.");
+    }
+
+    if (!is_java_ok) {
+        logging::error("Check https://docs.allaymc.org/getting-started/installation/#install-java");
+        return false;
+    }
+
+    logging::info("Detected java version: {}", format(fg(fmt::color::green), "{}", *version));
+    return is_java_ok;
+}
+
 } // namespace allay_launcher::util::java
