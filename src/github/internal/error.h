@@ -2,24 +2,28 @@
 
 namespace allay_launcher::github {
 
-enum class GetReleaseError { Ok, NetworkError, JsonError, NotFound };
+class GetReleaseException : public std::exception {
+public:
+    static auto NetworkError() { return GetReleaseException{_NetworkError}; }
+    static auto JsonError() { return GetReleaseException{_JsonError}; }
+    static auto NotFound() { return GetReleaseException{_NotFound}; }
 
-inline namespace error_util {
-
-constexpr std::string to_string(GetReleaseError error) {
-    switch (error) {
-    case GetReleaseError::Ok:
-        return "Everything is ok.";
-    case GetReleaseError::NetworkError:
-        return "Network error.";
-    case GetReleaseError::JsonError:
-        return "Json error.";
-    case GetReleaseError::NotFound:
-        return "Not found.";
+    const char* what() const noexcept override {
+        switch (m_error_code) {
+        case _NetworkError:
+            return "Network error.";
+        case _JsonError:
+            return "Json error.";
+        case _NotFound:
+            return "Not found.";
+        }
+        return "Unknown error.";
     }
-    return "Unknown error.";
-}
 
-} // namespace error_util
+private:
+    enum error_code { _NetworkError, _JsonError, _NotFound } m_error_code;
+
+    explicit GetReleaseException(error_code code) : m_error_code(code) {}
+};
 
 } // namespace allay_launcher::github

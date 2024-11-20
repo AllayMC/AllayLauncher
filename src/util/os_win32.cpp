@@ -6,10 +6,10 @@
 
 namespace allay_launcher::util::os {
 
-std::expected<SystemProxyInfo, SimpleError> configured_proxy_info() {
+std::optional<SystemProxyInfo> configured_proxy_info() {
     WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxy_config;
     if (!WinHttpGetIEProxyConfigForCurrentUser(&proxy_config)) {
-        return std::unexpected(SimpleError::Failed);
+        return {};
     }
 
     SystemProxyInfo info;

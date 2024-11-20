@@ -4,7 +4,6 @@
 #include "allay_server.h"
 #include "config.h"
 #include "util/java.h"
-#include "util/os.h"
 #include "util/string.h"
 
 
@@ -97,9 +96,10 @@ int main(int argc, char* argv[]) try {
 
     do {
         if (args.m_update) {
-            auto result = server.update(args.m_use_nightly);
-            if (!result) {
-                logging::error(error_util::to_string(result.error()));
+            try {
+                server.update(args.m_use_nightly);
+            } catch (const UpdateAllayException& e) {
+                logging::error(e.what());
                 return -1;
             }
         }

@@ -2,17 +2,12 @@
 
 namespace allay_launcher::util::string {
 
-std::expected<int32_t, SimpleError> to_int32(std::string_view str) {
-    char* str_end = nullptr;
-    errno         = 0;
+bool starts_with(const std::string& str, const std::string& prefix) {
+    return prefix.size() <= str.size() && str.compare(0, prefix.size(), prefix) == 0;
+}
 
-    long value = std::strtol(str.data(), &str_end, 0);
-
-    if (str_end == str.data() || errno == ERANGE || *str_end != '\0') {
-        return std::unexpected(SimpleError::Failed);
-    }
-
-    return value;
+bool ends_with(const std::string& str, const std::string& suffix) {
+    return suffix.size() <= str.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 void remove_prefix(std::string& str, const std::string& prefix) {
@@ -25,6 +20,19 @@ void remove_suffix(std::string& str, const std::string& suffix) {
     if (str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0) {
         str.erase(str.size() - suffix.size());
     }
+}
+
+std::optional<int32_t> to_int32(std::string_view str) {
+    char* str_end = nullptr;
+    errno         = 0;
+
+    long value = std::strtol(str.data(), &str_end, 0);
+
+    if (str_end == str.data() || errno == ERANGE || *str_end != '\0') {
+        return {};
+    }
+
+    return value;
 }
 
 std::vector<std::string> split(std::string_view str, std::string_view delimiter) {

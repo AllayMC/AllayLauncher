@@ -1,20 +1,18 @@
 #include "util/network.h"
-#include "cpr/api.h"
 
 #include <cpr/cpr.h>
 #include <util/progress_bar.h>
 
 namespace allay_launcher::util::network {
 
-std::expected<void, DownloadFileError>
-download(cpr::Session& session, std::string_view download_url, std::string_view save_path) {
+void download(cpr::Session& session, std::string_view download_url, std::string_view save_path) {
     if (std::filesystem::exists(save_path)) {
-        return std::unexpected(DownloadFileError::FileExistsError);
+        throw DownloadFileException::FileExistsError();
     }
 
     std::ofstream save_file(save_path.data(), std::ios::binary);
     if (!save_file) {
-        return std::unexpected(DownloadFileError::UnableToOpenFileError);
+        throw DownloadFileException::UnableToOpenFileError();
     }
 
     progresscpp::ProgressBar progress_bar(100, 70);
@@ -38,9 +36,8 @@ download(cpr::Session& session, std::string_view download_url, std::string_view 
     progress_bar.done(format(fg(fmt::color::green), "\u221a"));
     if (download_response.status_code != 200) {
         std::filesystem::remove(save_path);
-        return std::unexpected(DownloadFileError::NetworkError);
+        throw DownloadFileException::NetworkError();
     }
-    return {};
 }
 
 

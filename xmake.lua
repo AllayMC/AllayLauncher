@@ -25,17 +25,13 @@ target('allay')
         add_links('winhttp.lib')
         add_cxflags('/utf-8')
     else 
-        remove_files("src/**_win32.*")
-        -- workaround for clangd-18 bug.
-        add_defines('__cpp_lib_expected')
-    end
-
-    if is_plat("linux") then
         set_symbols("hidden")
         set_strip("all")
+
+        remove_files("src/**_win32.*")
     end
 
-    set_languages('c++23')
+    set_languages('c++17')
     set_optimize('smallest')
 
     set_pcxxheader('src/pch.h')

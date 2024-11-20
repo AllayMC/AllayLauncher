@@ -9,12 +9,12 @@ struct SystemProxyInfo {
     std::string m_proxy_bypass;
 };
 
-std::expected<std::string, CommandExecutionError> execute(std::string_view command);
+std::string execute(std::string_view command);
 
 void system(std::string_view command);
 
 #ifdef _WIN32
-std::expected<SystemProxyInfo, SimpleError> configured_proxy_info();
+std::optional<SystemProxyInfo> configured_proxy_info();
 #endif
 
 } // namespace allay_launcher::util::os
