@@ -4,6 +4,7 @@
 #include "allay_server.h"
 #include "config.h"
 #include "util/java.h"
+#include "util/os.h"
 #include "util/string.h"
 
 
@@ -16,23 +17,27 @@ void setup_logger() {
     logging::set_pattern("[%^%l%$] %v");
 }
 
-auto parse_arguments(int argc, char* argv[]) {
+struct Args {
+    static Args default_value() { return {true, true, true, false, ""}; }
+
+    bool m_run;
+    bool m_update;
+    bool m_use_nightly;
+    bool m_deamon;
+
+    std::string m_extra_vm_args;
+};
+
+Args parse_arguments(int argc, char* argv[]) {
     using namespace argparse;
 
     ArgumentParser program("allay", ALLAY_LAUNCHER_VERSION);
 
-    struct _args {
-        static _args default_value() { return {.m_run = true, .m_update = true, .m_use_nightly = true}; }
+    if (argc == 1) {
+        return Args::default_value();
+    }
 
-        bool m_run;
-        bool m_update;
-        bool m_use_nightly;
-        bool m_deamon;
-
-        std::string m_extra_vm_args;
-    } args;
-
-    if (argc == 1) return _args::default_value();
+    Args args;
 
     // clang-format off
 
