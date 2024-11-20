@@ -11,8 +11,6 @@
 namespace allay_launcher {
 
 void AllayServer::run() {
-    if (!_check_java()) return;
-
     auto cmd = fmt::format("java -jar {} {}", m_vm_extra_arguments, util::file::read_file(".current_allay_jar_name"));
     logging::info("Used command: {}", cmd);
     util::os::system(cmd);
