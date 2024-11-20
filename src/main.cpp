@@ -1,4 +1,5 @@
 #include <argparse/argparse.hpp>
+#include <cstdlib>
 
 #include "allay_server.h"
 #include "config.h"
@@ -69,7 +70,9 @@ auto parse_arguments(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) try {
-
+#ifdef _WIN32
+    util::os::system("chcp 65001");
+#endif
     setup_logger();
 
     logging::info(
