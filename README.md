@@ -32,7 +32,7 @@ Available options:
 
 - `-u` Check for update before starting the server
 - `-r` Run allay server
-- `-n` Use nightly build (default)
+- `-n` Use nightly build
 - `-a` Pass arguments to java
 - `-d` Use deamon mode, which the launcher will restart the server after server stopped
 
