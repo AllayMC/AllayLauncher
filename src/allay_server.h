@@ -11,7 +11,7 @@ public:
 
     void set_vm_extra_arguments(std::string_view args) { m_vm_extra_arguments = args; };
 
-    void run();
+    bool run();
 
     std::expected<void, UpdateAllayError> update(bool use_nightly = false);
 

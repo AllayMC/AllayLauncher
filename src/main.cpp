@@ -105,7 +105,10 @@ int main(int argc, char* argv[]) try {
         }
 
         if (args.m_run) {
-            server.run();
+            if (!server.run()) {
+                // Failed to start the server. For example the allay jar file is not found
+                break;
+            }
         }
 
         args.m_deamon = args.m_deamon && args.m_run;

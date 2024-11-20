@@ -10,10 +10,17 @@
 
 namespace allay_launcher {
 
-void AllayServer::run() {
-    auto cmd = fmt::format("java -jar {} {}", m_vm_extra_arguments, util::file::read_file(".current_allay_jar_name"));
+bool AllayServer::run() {
+    auto filename = util::file::read_file(".current_allay_jar_name");
+    if (!std::filesystem::exists(filename)) {
+        logging::error("Jar file not found. Please run 'allay' without any argument to get the jar file.");
+        std::filesystem::remove(filename);
+        return false;
+    }
+    auto cmd = fmt::format("java -jar {} {}", m_vm_extra_arguments, filename);
     logging::info("Used command: {}", cmd);
     util::os::system(cmd);
+    return true;
 }
 
 std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
