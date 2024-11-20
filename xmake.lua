@@ -23,6 +23,7 @@ target('allay')
 
     if is_plat('windows') then
         add_links('winhttp.lib')
+        add_cxflags('/utf-8')
     else 
         remove_files("src/**_win32.*")
         -- workaround for clangd-18 bug.

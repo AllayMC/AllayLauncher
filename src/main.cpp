@@ -20,7 +20,7 @@ void setup_logger() {
 auto parse_arguments(int argc, char* argv[]) {
     using namespace argparse;
 
-    ArgumentParser program("allay", "0.1.0");
+    ArgumentParser program("allay", "1.0.0-BETA");
 
     struct _args {
         static _args default_value() { return {.m_run = true, .m_update = true, .m_use_nightly = true}; }
