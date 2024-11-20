@@ -6,10 +6,10 @@ namespace allay_launcher::github {
 
 class Release {
 public:
-    static std::expected<Release, SimpleError> from_json(const nlohmann::json& data);
+    static std::optional<Release> from_json(const nlohmann::json& data);
 
     struct Asset {
-        static std::expected<Asset, SimpleError> from_json(const nlohmann::json& data);
+        static std::optional<Asset> from_json(const nlohmann::json& data);
 
         std::string m_name;
         std::string m_browser_download_url;

@@ -4,7 +4,7 @@
 
 namespace allay_launcher::util::java {
 
-std::expected<Version, GetOSJavaVersionError> installed_version();
+Version installed_version();
 
 bool check_java();
 

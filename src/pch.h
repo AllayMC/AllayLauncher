@@ -12,6 +12,8 @@
 
 #include <array>
 
+#include <optional>
+
 // C Standard Libraries
 
 #include <cstdio>

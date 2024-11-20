@@ -5,23 +5,27 @@
 
 namespace allay_launcher::util::java {
 
-std::expected<Version, GetOSJavaVersionError> installed_version() {
+Version installed_version() {
     using namespace string;
 
-    // Do not use "java --version", which is not supported on java-1.8
-    // The output of this command will be written into error stream
-    // so we need to add the suffix "2>&1" to redirect the output
-    auto output = os::execute("java -version 2>&1");
+    std::string output;
 
-    if (!output) return std::unexpected(GetOSJavaVersionError::ExecuteCommandFailed);
+    try {
+        // Do not use "java --version", which is not supported on java-1.8
+        // The output of this command will be written into error stream
+        // so we need to add the suffix "2>&1" to redirect the output
+        output = os::execute("java -version 2>&1");
+    } catch (const CommandExecutionException& e) {
+        throw GetOSJavaVersionException::ExecuteCommandFailed();
+    }
 
-    auto lines             = split(*output, "\n");
+    auto lines             = split(output, "\n");
     auto first_line_tokens = split(lines.at(0), " ");
 
     // openjdk version "21.0.4" 2024-07-16
     //                          ^ (optional)
     if (first_line_tokens.size() < 3) {
-        return std::unexpected(GetOSJavaVersionError::ParseVersionFailed);
+        throw GetOSJavaVersionException::ParseVersionFailed();
     }
 
     auto version_string = first_line_tokens.at(2);
@@ -36,24 +40,27 @@ std::expected<Version, GetOSJavaVersionError> installed_version() {
     if (auto ret = Version::parse(version_string)) {
         return *ret;
     } else {
-        return std::unexpected(GetOSJavaVersionError::ParseVersionFailed);
+        throw GetOSJavaVersionException::ParseVersionFailed();
     }
 }
 
 bool check_java() {
     bool is_java_ok = false;
 
-    auto version = util::java::installed_version();
-    if (version) {
-        Version min_required_version{21, 0, 0};
-        if (*version < min_required_version) {
-            logging::error("Unsupported java version: {}", *version);
-            logging::error("Please update your java to 21 or higher.");
-        } else {
-            is_java_ok = true;
-        }
-    } else {
+    Version version;
+
+    try {
+        version = util::java::installed_version();
+    } catch (const GetOSJavaVersionException& e) {
         logging::error("Failed to check java version, please make sure if java is installed correctly.");
+    }
+
+    Version min_required_version{21, 0, 0};
+    if (version < min_required_version) {
+        logging::error("Unsupported java version: {}", version);
+        logging::error("Please update your java to 21 or higher.");
+    } else {
+        is_java_ok = true;
     }
 
     if (!is_java_ok) {
@@ -61,7 +68,7 @@ bool check_java() {
         return false;
     }
 
-    logging::info("Detected java version: {}", format(fg(fmt::color::green), "{}", *version));
+    logging::info("Detected java version: {}", format(fg(fmt::color::green), "{}", version));
     return is_java_ok;
 }
 

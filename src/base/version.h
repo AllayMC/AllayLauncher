@@ -5,9 +5,28 @@
 namespace allay_launcher {
 
 struct Version {
-    static std::expected<Version, SimpleError> parse(std::string_view str);
+    static std::optional<Version> parse(std::string_view str);
 
-    auto operator<=>(const Version&) const = default;
+    // C++20
+    // auto operator<=>(const Version&) const = default;
+
+    bool operator<(const Version& other) const {
+        return std::tie(m_major, m_minor, m_revision) < std::tie(other.m_major, other.m_minor, other.m_revision);
+    }
+
+    bool operator>(const Version& other) const { return other < *this; }
+
+    bool operator<=(const Version& other) const { return !(other < *this); }
+
+    bool operator>=(const Version& other) const { return !(*this < other); }
+
+    bool operator==(const Version& other) const {
+        return std::tie(m_major, m_minor, m_revision) == std::tie(other.m_major, other.m_minor, other.m_revision);
+    }
+
+    bool operator!=(const Version& other) const { return !(*this == other); }
+
+    // to string
 
     operator std::string() const { return fmt::format("{}.{}.{}", m_major, m_minor, m_revision); }
 

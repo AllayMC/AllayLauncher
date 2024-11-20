@@ -6,11 +6,11 @@ namespace allay_launcher::util::os {
 
 using namespace internal;
 
-std::expected<std::string, CommandExecutionError> execute(std::string_view command) {
+std::string execute(std::string_view command) {
     logging::debug("execute(): {}", command);
 
     Popen pipe(command, "r");
-    if (!pipe.get()) return std::unexpected(CommandExecutionError::CreatePipeError);
+    if (!pipe.get()) throw CommandExecutionException::CreatePipeError();
 
     std::array<char, 128> buffer;
     std::string           ret;

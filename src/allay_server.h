@@ -13,7 +13,7 @@ public:
 
     bool run();
 
-    std::expected<void, UpdateAllayError> update(bool use_nightly = false);
+    void update(bool use_nightly = false);
 
 private:
     std::string m_path; // TODO
