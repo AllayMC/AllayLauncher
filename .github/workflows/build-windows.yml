@@ -6,14 +6,6 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        arch:
-          - x86
-          - x64
-          - arm
-          - arm64
-          - arm64ec
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +26,13 @@ jobs:
           xmake repo -u
 
       - run: |
-          xmake f -a ${{ matrix.arch }} -m release -p windows -v -y
+          xmake f -a x64 -m release -p windows -v -y
 
       - run: |
           xmake -v -y
 
       - uses: actions/upload-artifact@v4
         with:
-          name: allay-launcher-windows-${{ matrix.arch }}
+          name: allay-launcher-windows-x64
           path: |
-            build/windows/${{ matrix.arch }}/release
+            build/windows/x64/release

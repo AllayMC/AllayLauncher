@@ -6,15 +6,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        arch:
-          - x86
-          - x64
-          - arm
-          - arm64
-          - arm64ec
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -35,13 +27,13 @@ jobs:
           xmake repo -u
 
       - run: |
-          xmake f -a ${{ matrix.arch }} -m release -p linux -v -y
+          xmake f -a x64 -m release -p linux -v -y
 
       - run: |
           xmake -v -y
 
       - uses: actions/upload-artifact@v4
         with:
-          name: allay-launcher-linux-${{ matrix.arch }}
+          name: allay-launcher-linux-x64
           path: |
-            build/linux/${{ matrix.arch }}/release
+            build/linux/x64/release
