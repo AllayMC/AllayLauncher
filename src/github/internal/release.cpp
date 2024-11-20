@@ -22,7 +22,10 @@ std::optional<Release> Release::from_json(const nlohmann::json& data) {
 
 std::optional<Release::Asset> Release::Asset::from_json(const nlohmann::json& data) {
     try {
-        return Release::Asset{data["name"], data["browser_download_url"]};
+        Release::Asset asset;
+        asset.m_name                 = data["name"];
+        asset.m_browser_download_url = data["browser_download_url"];
+        return asset;
     } catch (const json::exception& e) {
         return {};
     }
