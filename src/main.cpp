@@ -1,5 +1,4 @@
 #include <argparse/argparse.hpp>
-#include <cstdlib>
 
 #include "allay_server.h"
 #include "config.h"
