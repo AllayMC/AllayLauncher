@@ -38,8 +38,14 @@ Available options:
 
 Start the server with specified maximum memory limit:
 
+Windows(cmd):
 ```bash
 allay -u -r -n -a '-Xms1G -Xmx4G'
+```
+
+Linux(bash):
+```bash
+allay -u -r -n -a '\-Xms1G \-Xmx4G'
 ```
 
 Start the server, and will restart the server if server crashed:
