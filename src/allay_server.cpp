@@ -2,14 +2,11 @@
 
 #include "spdlog/spdlog.h"
 #include "util/file.h"
-#include "util/java.h"
 #include "util/network.h"
 #include "util/os.h"
 
 #include "github/repo_api.h"
-#include <chrono>
 #include <filesystem>
-#include <thread>
 
 namespace allay_launcher {
 
@@ -84,31 +81,6 @@ std::expected<void, UpdateAllayError> AllayServer::update(bool use_nightly) {
     std::filesystem::remove(current_allay_jar_name);
 
     return {};
-}
-
-bool AllayServer::_check_java() {
-    bool is_java_ok = false;
-
-    auto version = util::java::installed_version();
-    if (version) {
-        Version min_required_version{21, 0, 0};
-        if (*version < min_required_version) {
-            logging::error("Unsupported java version: {}", *version);
-            logging::error("Please update your java to 21 or higher.");
-        } else {
-            is_java_ok = true;
-        }
-    } else {
-        logging::error("Failed to check java version, please make sure if java is installed correctly.");
-    }
-
-    if (!is_java_ok) {
-        logging::error("Check https://docs.allaymc.org/getting-started/installation/#install-java");
-        return false;
-    }
-
-    logging::info("Detected java version: {}", format(fg(fmt::color::green), "{}", *version));
-    return is_java_ok;
 }
 
 } // namespace allay_launcher

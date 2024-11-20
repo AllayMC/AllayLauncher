@@ -1,12 +1,12 @@
 #include <argparse/argparse.hpp>
+#include <spdlog/spdlog.h>
 
 #include "allay_server.h"
 #include "config.h"
-
-#include "spdlog/spdlog.h"
+#include "util/java.h"
+#include "util/os.h"
 #include "util/string.h"
 
-#include "util/os.h"
 
 using namespace allay_launcher;
 
@@ -79,6 +79,10 @@ int main(int argc, char* argv[]) try {
         format(fg(fmt::color::green), ALLAY_LAUNCHER_VERSION),
         format(fg(fmt::color::yellow), GIT_COMMIT)
     );
+
+    if (!util::java::check_java()) {
+        return -1;
+    }
 
     auto args = parse_arguments(argc, argv);
 
