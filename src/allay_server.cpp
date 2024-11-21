@@ -6,9 +6,7 @@
 #include "util/os.h"
 #include "util/string.h"
 
-#include "github/internal/error.h"
 #include "github/repo_api.h"
-
 
 namespace allay_launcher {
 

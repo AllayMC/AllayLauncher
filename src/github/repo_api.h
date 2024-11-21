@@ -1,6 +1,7 @@
 #pragma once
 
 #include "github/internal/api_base.h"
+#include "github/internal/error.h"
 #include "github/internal/release.h"
 
 namespace allay_launcher::github {
