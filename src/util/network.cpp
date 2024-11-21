@@ -1,4 +1,5 @@
 #include "util/network.h"
+#include "spdlog/spdlog.h"
 
 #include <cpr/cpr.h>
 #include <util/progress_bar.h>
@@ -14,6 +15,8 @@ void download(cpr::Session& session, std::string_view download_url, std::string_
     if (!save_file) {
         throw DownloadFileException::UnableToOpenFileError();
     }
+
+    logging::debug("download(): {}", download_url);
 
     progresscpp::ProgressBar progress_bar(100, 70);
     session.SetUrl(download_url);
