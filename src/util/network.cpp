@@ -35,6 +35,7 @@ void download(cpr::Session& session, std::string_view download_url, std::string_
     auto download_response = session.Download(save_file);
     progress_bar.done(format(fg(fmt::color::green), "\u221a"));
     if (download_response.status_code != 200) {
+        logging::error("Unable to download file. Status code: {}", download_response.status_code);
         std::filesystem::remove(save_path);
         throw DownloadFileException::NetworkError();
     }
