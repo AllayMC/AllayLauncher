@@ -5,7 +5,7 @@ add_repositories('allaymc-repo https://github.com/AllayMC/xmake-repo.git')
 add_requires('argparse      3.1')
 add_requires('spdlog        1.14.1')
 add_requires('nlohmann_json 3.11.3')
-add_requires('cpr           1.11.0')
+add_requires('cpr           1.11.0', {configs = {ssl = true}})
 
 target('allay')
     set_kind('binary')
