@@ -12,8 +12,11 @@ release_list_t RepoApi::get_releases() const {
     session->SetUrl(build_url() + "/releases");
     auto response = session->Get();
 
-    if (response.status_code == 404) throw GetReleaseException::NetworkError();
-    if (response.status_code != 200) throw GetReleaseException::NetworkError();
+    if (response.status_code == 404) throw GetReleaseError::NotFound();
+    if (response.status_code != 200) {
+        logging::error("Unable to get release list. Status code: {}", response.status_code);
+        throw GetReleaseException::NetworkError();
+    }
 
     try {
         auto ret  = release_list_t{};
@@ -48,7 +51,10 @@ release_t RepoApi::_fetch_release(const cpr::Url& url) const {
     auto response = session->Get();
 
     if (response.status_code == 404) throw GetReleaseException::NotFound();
-    if (response.status_code != 200) throw GetReleaseException::NetworkError();
+    if (response.status_code != 200) {
+        logging::error("Unable to fetch release. Status code: {}", response.status_code);
+        throw GetReleaseException::NetworkError();
+    }
 
     try {
         auto data = json::parse(response.text);
