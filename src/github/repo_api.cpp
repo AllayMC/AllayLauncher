@@ -8,9 +8,11 @@ using json = nlohmann::json;
 namespace allay_launcher::github {
 
 release_list_t RepoApi::get_releases() const {
-    auto session = create_session();
+    auto url = build_url() + "/releases";
+    logging::debug("get_releases(): {}", url.str());
 
-    session->SetUrl(build_url() + "/releases");
+    auto session = create_session();
+    session->SetUrl(url);
     auto response = session->Get();
 
     if (response.status_code == 404) throw GetReleaseException::NotFound();
@@ -47,6 +49,7 @@ release_t RepoApi::get_release_by_tag(std::string_view tag) const {
 release_t RepoApi::get_latest_release() const { return _fetch_release(build_url() + "/releases/latest"); }
 
 release_t RepoApi::_fetch_release(const cpr::Url& url) const {
+    logging::debug("_fetch_release(): {}", url.str());
     auto session = create_session();
 
     session->SetUrl(url);
