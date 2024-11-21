@@ -1,6 +1,7 @@
 #include <nlohmann/json.hpp>
 
 #include "github/repo_api.h"
+#include "spdlog/spdlog.h"
 
 using json = nlohmann::json;
 
@@ -15,6 +16,7 @@ release_list_t RepoApi::get_releases() const {
     if (response.status_code == 404) throw GetReleaseException::NotFound();
     if (response.status_code != 200) {
         logging::error("Unable to get release list. Status code: {}", response.status_code);
+        logging::error("Text: {}", response.text);
         throw GetReleaseException::NetworkError();
     }
 
@@ -53,6 +55,7 @@ release_t RepoApi::_fetch_release(const cpr::Url& url) const {
     if (response.status_code == 404) throw GetReleaseException::NotFound();
     if (response.status_code != 200) {
         logging::error("Unable to fetch release. Status code: {}", response.status_code);
+        logging::error("Text: {}", response.text);
         throw GetReleaseException::NetworkError();
     }
 
