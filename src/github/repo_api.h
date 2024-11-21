@@ -3,8 +3,6 @@
 #include "github/internal/api_base.h"
 #include "github/internal/release.h"
 
-#include "github/internal/error.h"
-
 namespace allay_launcher::github {
 
 class RepoApi : public ApiBase {
