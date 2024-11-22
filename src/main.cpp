@@ -1,18 +1,17 @@
 #include <argparse/argparse.hpp>
-#include <spdlog/spdlog.h>
 
 #include "allay_server.h"
-#include "config.h"
-#include "util/java.h"
-#include "util/os.h"
-#include "util/string.h"
 
+#include "config.h"
+
+#include "util/java.h"
+#include "util/string.h"
 
 using namespace allay_launcher;
 
 void setup_logger() {
 #ifdef DEBUG
-    logging::set_level(spdlog::level::debug);
+    logging::set_level(logging::level::debug);
 #endif
     logging::set_pattern("[%^%l%$] %v");
 }
@@ -72,13 +71,16 @@ auto parse_arguments(int argc, char* argv[]) {
 
     // clang-format on
 
+    args.m_deamon = args.m_deamon && args.m_run;
+
     return args;
 }
 
 int main(int argc, char* argv[]) try {
 #ifdef _WIN32
-    util::os::system("chcp 65001");
+    util::os::set_console_cp_utf8();
 #endif
+
     setup_logger();
 
     logging::info(
@@ -106,9 +108,8 @@ int main(int argc, char* argv[]) try {
         if (args.m_update) {
             try {
                 server.update(args.m_use_nightly);
-            } catch (const UpdateAllayException& e) {
+            } catch (const BaseException& e) {
                 logging::error(e.what());
-                return -1;
             }
         }
 
@@ -119,7 +120,6 @@ int main(int argc, char* argv[]) try {
             }
         }
 
-        args.m_deamon = args.m_deamon && args.m_run;
         if (args.m_deamon) {
             logging::info("Deamon mode is enabled, server will be restarted in 5 seconds. Use Ctrl+C to interrupt.");
             std::this_thread::sleep_for(std::chrono::seconds(5));

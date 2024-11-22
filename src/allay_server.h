@@ -13,12 +13,20 @@ public:
 
     bool run();
 
+    /* @Throwable IOException
+     * @Throwable ConnectionException
+     * @Throwable NeedUpdateException
+     * @Throwable github
+     */
     void update(bool use_nightly = false);
 
 private:
-    std::string m_path; // TODO
+    std::string m_path;
 
     std::string m_vm_extra_arguments;
+
+    std::string _current_jar_name() const;
+    void        _current_jar_name(std::string_view new_current_jar_name);
 };
 
 } // namespace allay_launcher

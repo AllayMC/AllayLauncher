@@ -18,5 +18,7 @@
 
 // Bases
 
-#include "base/error.h"
 #include "base/logger.h"
+
+#include "base/error.h"
+#include "base/global.h"

@@ -1,7 +1,6 @@
 #include <nlohmann/json.hpp>
 
 #include "github/repo_api.h"
-#include "spdlog/spdlog.h"
 
 using json = nlohmann::json;
 
@@ -9,33 +8,36 @@ namespace allay_launcher::github {
 
 release_list_t RepoApi::get_releases() const {
     auto url = build_url() + "/releases";
-    logging::debug("get_releases(): {}", url.str());
 
     auto session = create_session();
     session->SetUrl(url);
     auto response = session->Get();
 
-    if (response.status_code == 404) throw GetReleaseException::NotFound();
+    if (response.status_code == 404) throw NothingException();
     if (response.status_code != 200) {
-        logging::error("Unable to get release list. Status code: {}", response.status_code);
-        logging::error("Text: {}", response.text);
-        throw GetReleaseException::NetworkError();
+        throw ConnectionException(
+            (int)response.error.code,
+            response.status_code,
+            response.error.message,
+            response.url.str()
+        );
     }
 
+    auto ret = release_list_t{};
+
+    json data;
+
     try {
-        auto ret  = release_list_t{};
-        auto data = json::parse(response.text);
-        for (const auto& release_data : data) {
-            if (auto release = release_t::from_json(release_data)) {
-                ret.emplace_back(*release);
-            } else {
-                throw GetReleaseException::JsonError();
-            }
-        }
-        return ret;
+        data = json::parse(response.text);
     } catch (const json::exception& e) {
-        throw GetReleaseException::JsonError();
+        throw JsonException(e.what(), response.text);
     }
+
+    for (const auto& release_data : data) {
+        ret.emplace_back(release_t::from_json(release_data));
+    }
+
+    return ret;
 }
 
 release_t RepoApi::get_release_by_id(std::string_view id) const {
@@ -49,29 +51,30 @@ release_t RepoApi::get_release_by_tag(std::string_view tag) const {
 release_t RepoApi::get_latest_release() const { return _fetch_release(build_url() + "/releases/latest"); }
 
 release_t RepoApi::_fetch_release(const cpr::Url& url) const {
-    logging::debug("_fetch_release(): {}", url.str());
     auto session = create_session();
 
     session->SetUrl(url);
     auto response = session->Get();
 
-    if (response.status_code == 404) throw GetReleaseException::NotFound();
+    if (response.status_code == 404) throw NothingException();
     if (response.status_code != 200) {
-        logging::error("Unable to fetch release. Status code: {}", response.status_code);
-        logging::error("Text: {}", response.text);
-        throw GetReleaseException::NetworkError();
+        throw ConnectionException(
+            (int)response.error.code,
+            response.status_code,
+            response.error.message,
+            response.url.str()
+        );
     }
 
+    json data;
+
     try {
-        auto data = json::parse(response.text);
-        if (auto release = release_t::from_json(data)) {
-            return *release;
-        } else {
-            throw GetReleaseException::JsonError();
-        }
+        data = json::parse(response.text);
     } catch (const json::exception& e) {
-        throw GetReleaseException::JsonError();
+        throw JsonException(e.what(), response.text);
     }
+
+    return release_t::from_json(data);
 }
 
 } // namespace allay_launcher::github

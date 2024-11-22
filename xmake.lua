@@ -5,7 +5,7 @@ add_repositories('allaymc-repo https://github.com/AllayMC/xmake-repo.git')
 add_requires('argparse      3.1')
 add_requires('spdlog        1.14.1')
 add_requires('nlohmann_json 3.11.3')
-add_requires('cpr           1.11.0', {configs = {ssl = true}})
+add_requires('cpr           1.11.0')
 
 target('allay')
     set_kind('binary')
@@ -24,10 +24,9 @@ target('allay')
     if is_plat('windows') then
         add_links('winhttp.lib')
         add_cxflags('/utf-8')
-    else 
-        set_symbols("hidden")
-        set_strip("all")
 
+        remove_files("src/**_linux.*")
+    else 
         remove_files("src/**_win32.*")
     end
 
