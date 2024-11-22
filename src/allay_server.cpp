@@ -1,25 +1,24 @@
 #include "allay_server.h"
 
-#include "spdlog/spdlog.h"
-#include "util/file.h"
 #include "util/network.h"
 #include "util/os.h"
 #include "util/string.h"
 
 #include "github/repo_api.h"
 
+constexpr std::string_view ALLAY_SERVER_JAR_NAME = ".allay_current";
+constexpr std::string_view ALLAY_NIGHTLY_TAG     = "nightly";
+
 namespace allay_launcher {
 
 bool AllayServer::run() {
-    auto filename = util::file::read_file(".current_allay_jar_name");
-    if (!std::filesystem::exists(filename)) {
-        logging::error("Jar file not found. Please run 'allay' without any argument to get the jar file.");
-        std::filesystem::remove(".current_allay_jar_name");
+    auto jar_name = _current_jar_name();
+    if (jar_name.empty() || !std::filesystem::exists(jar_name)) {
+        logging::error("Allay server not found. Please run 'allay' without any argument to get the jar file.");
         return false;
     }
-    auto cmd = fmt::format("java -jar {} {}", m_vm_extra_arguments, filename);
-    logging::info("Used command: {}", cmd);
-    util::os::system(cmd);
+    auto cmd = fmt::format("java -jar {} {}", m_vm_extra_arguments, jar_name);
+    util::os::run(cmd);
     return true;
 }
 
@@ -33,64 +32,51 @@ void AllayServer::update(bool use_nightly) {
     api.author("AllayMC")
          .repo("Allay");
     
-    release_t release;
-
-    try {
-        release = !use_nightly
-             ? api.get_latest_release()
-             : api.get_release_by_tag("nightly");
-    } catch(const GetReleaseException& e) {
-        logging::error(e.what());
-        throw UpdateAllayException::GetReleaseError();
-    }
+    release_t release = !use_nightly
+        ? api.get_latest_release()
+        : api.get_release_by_tag(ALLAY_NIGHTLY_TAG);
 
     // clang-format on
 
     auto& assets = release.get_assets();
-
-    if (assets.size() != 1) {
-        logging::error("Wrong assert count which should be one.");
-        throw UpdateAllayException::WrongAssertCount();
-    }
+    if (assets.size() != 1) throw NeedUpdateException("assets.size() != 1");
 
     auto& asset = assets.front();
+    if (!util::string::starts_with(asset.m_name, "allay"))
+        throw NeedUpdateException("asset.name does not start with 'allay'");
 
-    std::string new_allay_jar_name = asset.m_name;
-    if (!util::string::starts_with(new_allay_jar_name, "allay")) {
-        // This should never happen in most cases
-        logging::error("Asset name should starts with 'allay'.");
-        throw UpdateAllayException::WrongFileName();
-    }
+    std::string new_jar_name = asset.m_name;
 
-    auto current_allay_jar_name = util::file::read_file(".current_allay_jar_name");
-    if (new_allay_jar_name == current_allay_jar_name) {
+    // If the file names are the same, then an update is assumed to exist.
+    auto old_jar_name = _current_jar_name();
+
+    if (new_jar_name == old_jar_name) {
         logging::info("Your allay version is up to date!");
         return;
     }
-    logging::info("New version {} found! Starting to update.", new_allay_jar_name);
 
-    auto tmp_file_name = new_allay_jar_name + ".tmp";
-    // That may because the last time user try to update
-    // allay but interrupt the process. We should remove
-    // the old tmp file as we do not know if it is completed
-    allay_launcher::util::file::remove_if_exists(tmp_file_name);
+    logging::info("New version {} found! Starting to update.", new_jar_name);
 
-    try {
-        util::network::download(*api.create_session(), asset.m_browser_download_url, tmp_file_name);
-    } catch (const DownloadFileException& e) {
-        logging::error(e.what());
-        throw UpdateAllayException::DownloadFileError();
-    }
-    allay_launcher::util::file::remove_if_exists(new_allay_jar_name);
-    std::filesystem::rename(tmp_file_name, new_allay_jar_name);
+    util::network::download(asset.m_browser_download_url, new_jar_name);
 
     // Write the new allay jar name after making sure the file is downloaded properly
-    util::file::clean_and_write_file(".current_allay_jar_name", new_allay_jar_name);
-    logging::info("Successfully updated to {}.", new_allay_jar_name);
-    // Delete the old jar file
-    std::filesystem::remove(current_allay_jar_name);
+    _current_jar_name(new_jar_name);
+    logging::info("Successfully updated to {}.", new_jar_name);
 
-    return;
+    // Delete the old jar file
+    std::filesystem::remove(old_jar_name);
+}
+
+std::string AllayServer::_current_jar_name() const {
+    std::ifstream ifs(ALLAY_SERVER_JAR_NAME.data());
+    return ifs.is_open() ? std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>())
+                         : std::string{};
+}
+
+void AllayServer::_current_jar_name(std::string_view new_current_jar_name) {
+    if (std::ofstream ofs(ALLAY_SERVER_JAR_NAME.data(), std::ios::trunc); ofs) {
+        ofs << new_current_jar_name;
+    }
 }
 
 } // namespace allay_launcher

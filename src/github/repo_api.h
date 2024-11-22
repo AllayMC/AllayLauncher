@@ -1,7 +1,6 @@
 #pragma once
 
 #include "github/internal/api_base.h"
-#include "github/internal/error.h"
 #include "github/internal/release.h"
 
 namespace allay_launcher::github {
@@ -20,10 +19,27 @@ public:
         return *this;
     }
 
+    /* @Throwable JsonException
+     * @Throwable ConnectionException
+     */
     release_list_t get_releases() const;
 
+    /* @Throwable NothingException
+     * @Throwable JsonException
+     * @Throwable ConnectionException
+     */
     release_t get_release_by_id(std::string_view id) const;
+
+    /* @Throwable NothingException
+     * @Throwable JsonException
+     * @Throwable ConnectionException
+     */
     release_t get_release_by_tag(std::string_view tag) const;
+
+    /* @Throwable NothingException
+     * @Throwable JsonException
+     * @Throwable ConnectionException
+     */
     release_t get_latest_release() const;
 
 protected:

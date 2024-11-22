@@ -2,97 +2,61 @@
 
 namespace allay_launcher {
 
-class GetOSJavaVersionException : public std::exception {
+class BaseException : public std::exception {
 public:
-    static auto CommandNotFound() { return GetOSJavaVersionException{_CommandNotFound}; }
-    static auto ExecuteCommandFailed() { return GetOSJavaVersionException{_ExecuteCommandFailed}; }
-    static auto ParseVersionFailed() { return GetOSJavaVersionException{_ParseVersionFailed}; }
+    explicit BaseException(std::string_view str) : m_what(str) {}
 
-    const char* what() const noexcept override {
-        switch (m_error_code) {
-        case _CommandNotFound:
-            return "Command not found.";
-        case _ExecuteCommandFailed:
-            return "Execute command failed.";
-        case _ParseVersionFailed:
-            return "Parse java version failed.";
-        }
-        return "Unknown error.";
-    }
+    const char* what() const noexcept override { return m_what.c_str(); }
 
 private:
-    enum error_code { _CommandNotFound, _ExecuteCommandFailed, _ParseVersionFailed } m_error_code;
-
-    explicit GetOSJavaVersionException(error_code code) : m_error_code(code) {}
+    std::string m_what;
 };
 
-class CommandExecutionException : public std::exception {
+class ConnectionException : public BaseException {
 public:
-    static auto CreatePipeError() { return CommandExecutionException{_CreatePipeError}; }
-
-    const char* what() const noexcept override {
-        switch (m_error_code) {
-        case _CreatePipeError:
-            return "Cannot create pipe.";
-        }
-        return "Unknown error.";
-    }
-
-private:
-    enum error_code { _CreatePipeError } m_error_code;
-
-    explicit CommandExecutionException(error_code code) : m_error_code(code) {}
+    explicit ConnectionException(int error_code, int status_code, std::string_view message, std::string_view url)
+    : BaseException(
+          fmt::format("[exception.connection.{}] (status_code: {}, url: {}) {}", error_code, status_code, url, message)
+      ) {}
 };
 
-class DownloadFileException : public std::exception {
+class IOException : public BaseException {
 public:
-    static auto FileExistsError() { return DownloadFileException{_FileExistsError}; }
-    static auto UnableToOpenFileError() { return DownloadFileException{_UnableToOpenFileError}; }
-    static auto NetworkError() { return DownloadFileException{_NetworkError}; }
-
-    const char* what() const noexcept override {
-        switch (m_error_code) {
-        case _FileExistsError:
-            return "Can't create output file.";
-        case _UnableToOpenFileError:
-            return "Can't open file.";
-        case _NetworkError:
-            return "Network error.";
-        }
-        return "Unknown error.";
-    }
-
-private:
-    enum error_code { _FileExistsError, _UnableToOpenFileError, _NetworkError } m_error_code;
-
-    explicit DownloadFileException(error_code code) : m_error_code(code) {}
+    explicit IOException(std::string_view file, std::string_view message)
+    : BaseException(fmt::format("[exception.io] (file: {}) {}", file, message)) {}
 };
 
-class UpdateAllayException : public std::exception {
+class CommandExecutionException : public BaseException {
 public:
-    static auto GetReleaseError() { return UpdateAllayException{_GetReleaseError}; }
-    static auto WrongAssertCount() { return UpdateAllayException{_WrongAssertCount}; }
-    static auto WrongFileName() { return UpdateAllayException{_WrongFileName}; }
-    static auto DownloadFileError() { return UpdateAllayException{_DownloadFileError}; }
+    explicit CommandExecutionException(std::string_view cmd, std::string_view message)
+    : BaseException(fmt::format("[exception.command] (cmd: {}) {}", cmd, message)) {}
+};
 
-    const char* what() const noexcept override {
-        switch (m_error_code) {
-        case _GetReleaseError:
-            return "Error while getting release information.";
-        case _WrongAssertCount:
-            return "Wrong assert count error.";
-        case _WrongFileName:
-            return "Wrong assert file name.";
-        case _DownloadFileError:
-            return "Error while downloading file.";
-        }
-        return "Unknown error.";
-    }
+class ParserException : public BaseException {
+public:
+    explicit ParserException(std::string_view raw_str, std::string_view message)
+    : BaseException(fmt::format("[exception.parser] (str: {}) {}")) {}
+};
 
-private:
-    enum error_code { _GetReleaseError, _WrongAssertCount, _WrongFileName, _DownloadFileError } m_error_code;
+class NeedUpdateException : public BaseException {
+public:
+    explicit NeedUpdateException(std::string_view extra_info)
+    : BaseException(fmt::format(
+          "[exception.upstream] We ran into a situation we can't handle, please check for updates, "
+          "or open an issue. ({})",
+          extra_info
+      )) {}
+};
 
-    explicit UpdateAllayException(error_code code) : m_error_code(code) {}
+class JsonException : public BaseException {
+public:
+    explicit JsonException(std::string_view error_message, std::string_view json_str)
+    : BaseException(fmt::format("{}\n{}", error_message, json_str)) {}
+};
+
+class NothingException : public BaseException {
+public:
+    explicit NothingException() : BaseException("[exception.nothing] we can't find anything.") {}
 };
 
 } // namespace allay_launcher

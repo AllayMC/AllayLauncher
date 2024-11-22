@@ -2,19 +2,20 @@
 
 namespace allay_launcher::util::os {
 
-struct SystemProxyInfo {
-    bool        m_auto_detect;
-    std::string m_auto_config_url;
-    std::string m_proxy_server;
-    std::string m_proxy_bypass;
+struct SystemProxy {
+    std::string m_server;
 };
 
 std::string execute(std::string_view command);
 
-void system(std::string_view command);
+int run(std::string_view command);
+
+std::string environment(std::string_view var);
+
+std::optional<SystemProxy> system_proxy_configuration();
 
 #ifdef _WIN32
-std::optional<SystemProxyInfo> configured_proxy_info();
+void set_console_cp_utf8();
 #endif
 
 } // namespace allay_launcher::util::os

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+
 #include <spdlog/fmt/bundled/color.h>
 
 namespace progresscpp {

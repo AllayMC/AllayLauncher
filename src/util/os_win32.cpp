@@ -6,32 +6,25 @@
 
 namespace allay_launcher::util::os {
 
-std::optional<SystemProxyInfo> configured_proxy_info() {
-    WINHTTP_CURRENT_USER_IE_PROXY_CONFIG proxy_config;
-    if (!WinHttpGetIEProxyConfigForCurrentUser(&proxy_config)) {
+std::optional<SystemProxy> system_proxy_configuration() {
+    WINHTTP_CURRENT_USER_IE_PROXY_CONFIG _raw_system_config;
+    if (!WinHttpGetIEProxyConfigForCurrentUser(&_raw_system_config)) {
         return {};
     }
 
-    SystemProxyInfo info;
-
-    info.m_auto_detect = proxy_config.fAutoDetect;
-
-    if (proxy_config.lpszAutoConfigUrl) {
-        info.m_auto_config_url = string::from_wstring(proxy_config.lpszAutoConfigUrl);
-        GlobalFree(proxy_config.lpszAutoConfigUrl);
+    if (_raw_system_config.lpszProxy) {
+        SystemProxy config;
+        config.m_server = string::from_wstring(_raw_system_config.lpszProxy);
+        GlobalFree(_raw_system_config.lpszProxy);
+        return config;
     }
 
-    if (proxy_config.lpszProxy) {
-        info.m_proxy_server = string::from_wstring(proxy_config.lpszProxy);
-        GlobalFree(proxy_config.lpszProxy);
-    }
+    return {};
+}
 
-    if (proxy_config.lpszProxyBypass) {
-        info.m_proxy_bypass = string::from_wstring(proxy_config.lpszProxyBypass);
-        GlobalFree(proxy_config.lpszProxyBypass);
-    }
-
-    return info;
+void set_console_cp_utf8() {
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
 }
 
 } // namespace allay_launcher::util::os

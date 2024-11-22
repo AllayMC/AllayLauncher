@@ -1,4 +1,4 @@
-#include "os.h"
+#include "util/os.h"
 
 #include "internal/popen.h"
 
@@ -10,7 +10,7 @@ std::string execute(std::string_view command) {
     logging::debug("execute(): {}", command);
 
     Popen pipe(command, "r");
-    if (!pipe.get()) throw CommandExecutionException::CreatePipeError();
+    if (!pipe.get()) throw CommandExecutionException(command, "cannot create pipe.");
 
     std::array<char, 128> buffer;
     std::string           ret;
@@ -19,10 +19,29 @@ std::string execute(std::string_view command) {
     return ret;
 }
 
-void system(std::string_view command) {
-    logging::debug("system(): {}", command);
+int run(std::string_view command) {
+    logging::debug("run(): {}", command);
 
-    ::system(command.data());
+    return std::system(command.data());
+}
+
+std::string environment(std::string_view var) {
+    auto val = std::getenv(var.data());
+    return val ? std::string{val} : std::string{};
+}
+
+std::optional<SystemProxy> system_proxy_configuration() {
+    static const std::vector<std::string> vars{"https_proxy", "HTTPS_PROXY", "http_proxy", "HTTP_PROXY"};
+
+    for (auto& var : vars) {
+        if (auto env = environment(var); !env.empty()) {
+            SystemProxy config;
+            config.m_server = env;
+            return config;
+        }
+    }
+
+    return {};
 }
 
 } // namespace allay_launcher::util::os
