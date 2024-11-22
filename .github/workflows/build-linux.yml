@@ -20,7 +20,7 @@ jobs:
 
       - run: |
           sudo apt update
-          sudo apt install ca-certificates curl openssl
+          sudo apt install libssl-dev
 
       - name: Setup XMake
         uses: xmake-io/github-action-setup-xmake@v1
