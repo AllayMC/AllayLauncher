@@ -13,14 +13,14 @@ jobs:
     strategy:
       matrix:
         mode: [release, debug]
-    runs-on: ubuntu-22.04 # for compatibility.
+    runs-on: ubuntu-20.04 # for compatibility.
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - run: |
           sudo apt update
-          sudo apt install ca-certificates
+          sudo apt install ca-certificates curl openssl
 
       - name: Setup XMake
         uses: xmake-io/github-action-setup-xmake@v1
