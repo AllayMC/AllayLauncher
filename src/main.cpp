@@ -7,6 +7,10 @@
 #include "util/java.h"
 #include "util/string.h"
 
+#ifdef _WIN32
+#include "util/os.h" // set_console_cp_utf8
+#endif
+
 using namespace allay_launcher;
 
 void setup_logger() {
