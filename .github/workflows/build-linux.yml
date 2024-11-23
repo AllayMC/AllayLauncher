@@ -36,7 +36,7 @@ jobs:
 
       - name: Build for host
         run: |
-          xmake f -a x64 -m ${{ matrix.mode }} -p linux -v -y
+          xmake f -a x86_64 -m ${{ matrix.mode }} -p linux -v -y
           xmake -v -y
 
       - name: Upload artifact
