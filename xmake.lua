@@ -29,6 +29,8 @@ target('allay')
 
         remove_files("src/**_linux.*")
     else 
+        add_ldflags('-Bstatic')
+
         remove_files("src/**_win32.*")
     end
 
