@@ -18,6 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - run: |
+          sudo apt install libssl-dev
+          ls /usr/lib/x86_64-linux-gnu
+
       - name: Setup XMake
         uses: xmake-io/github-action-setup-xmake@v1
 
