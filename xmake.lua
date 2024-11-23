@@ -37,7 +37,6 @@ target('allay')
 
     set_configdir("$(buildir)/config")
     add_configfiles("src/config.h.in")
-    add_cxflags('-Wl,-Bdynamic')
 
     if is_mode('debug') then 
         add_defines('DEBUG')
