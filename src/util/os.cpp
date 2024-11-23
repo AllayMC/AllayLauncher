@@ -30,18 +30,4 @@ std::string environment(std::string_view var) {
     return val ? std::string{val} : std::string{};
 }
 
-std::optional<SystemProxy> system_proxy_configuration() {
-    static const std::vector<std::string> vars{"https_proxy", "HTTPS_PROXY", "http_proxy", "HTTP_PROXY"};
-
-    for (auto& var : vars) {
-        if (auto env = environment(var); !env.empty()) {
-            SystemProxy config;
-            config.m_server = env;
-            return config;
-        }
-    }
-
-    return {};
-}
-
 } // namespace allay_launcher::util::os

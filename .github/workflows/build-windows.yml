@@ -2,22 +2,26 @@ name: Build (Windows)
 
 on:
   push:
-    branches: [ "*" ]
+    paths:
+      - .github/workflows/build-windows.yml
+      - src/**
+      - xmake.lua
 
 jobs:
   build:
     strategy:
       matrix:
-        mode:
-          - release
-          - debug
+        mode: [release, debug]
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: xmake-io/github-action-setup-xmake@v1
+      - name: Setup XMake
+        uses: xmake-io/github-action-setup-xmake@v1
 
-      - uses: actions/cache@v4
+      - name: Restore xmake cache
+        uses: actions/cache@v4
         with:
           path: |
             ~/AppData/Local/.xmake
@@ -25,18 +29,23 @@ jobs:
           restore-keys: |
             xmake-windows-
 
-      - uses: microsoft/setup-msbuild@v2
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
 
-      - run: |
+      - name: Sync with repository
+        run: |
           xmake repo -u
 
-      - run: |
+      - name: Configure
+        run: |
           xmake f -a x64 -m ${{ matrix.mode }} -p windows -v -y
 
-      - run: |
+      - name: Build
+        run: |
           xmake -v -y
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: allay-launcher-windows-x64-${{ matrix.mode }}
           path: |
