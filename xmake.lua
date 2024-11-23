@@ -27,11 +27,12 @@ target('allay')
         add_links('winhttp.lib')
         add_cxflags('/utf-8')
 
-        remove_files("src/**_linux.*")
+        remove_files('src/**_linux.*')
     else 
-        add_ldflags('-Bstatic')
+        add_linkgroups('cpr', 'curl', 'ssl', 'crypto', {static = true})
+        add_links('dl')
 
-        remove_files("src/**_win32.*")
+        remove_files('src/**_win32.*')
     end
 
     set_languages('c++17')
@@ -39,8 +40,8 @@ target('allay')
 
     set_pcxxheader('src/pch.h')
 
-    set_configdir("$(buildir)/config")
-    add_configfiles("src/config.h.in")
+    set_configdir('$(buildir)/config')
+    add_configfiles('src/config.h.in')
 
     if is_mode('debug') then 
         add_defines('DEBUG')
