@@ -30,6 +30,7 @@ target('allay')
         remove_files('src/**_linux.*')
     else 
         add_linkgroups('cpr', 'curl', 'ssl', 'crypto', {static = true})
+        add_links('dl')
 
         remove_files('src/**_win32.*')
     end
