@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         mode: [release, debug]
-    runs-on: ubuntu-22.04 # for compatibility.
+    runs-on: ubuntu-20.04 # for compatibility.
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,22 +30,18 @@ jobs:
           restore-keys: |
             xmake-linux-${{ matrix.mode }}-
 
-      - name: Install build toolchains
-        run: |
-          sudo apt install -y build-essential
-
       - name: Sync with repository
         run: |
           xmake repo -u
 
       - name: Build for host
         run: |
-          xmake f -a x64 -m ${{ matrix.mode }} -p linux -v -y
+          xmake f -a x86_64 -m ${{ matrix.mode }} -p linux -v -y
           xmake -v -y
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: allay-launcher-linux-x64-${{ matrix.mode }}
+          name: allay-launcher-linux-x86_64-${{ matrix.mode }}
           path: |
-            build/linux/x64/${{ matrix.mode }}
+            build/linux/x86_64/${{ matrix.mode }}

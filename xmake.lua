@@ -2,6 +2,8 @@ add_rules('mode.debug', 'mode.release')
 
 add_repositories('allaymc-repo https://github.com/AllayMC/xmake-repo.git')
 
+add_requires('openssl', {system = true})
+
 add_requires('argparse      3.1')
 add_requires('spdlog        1.14.1')
 add_requires('nlohmann_json 3.11.3')
