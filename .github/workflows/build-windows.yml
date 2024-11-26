@@ -6,6 +6,7 @@ on:
       - .github/workflows/build-windows.yml
       - src/**
       - xmake.lua
+  workflow_dispatch:
 
 jobs:
   build:
