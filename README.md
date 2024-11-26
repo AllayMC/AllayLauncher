@@ -16,7 +16,7 @@ Install from one command line:
 Linux:
 
 ```bash
-
+wget -qO- https://raw.githubusercontent.com/AllayMC/AllayLauncher/refs/heads/main/scripts/install_linux.sh | bash
 ```
 
 Windows(PowerShell):
