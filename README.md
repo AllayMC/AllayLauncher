@@ -13,8 +13,16 @@ The launcher for [Allay](https://github.com/AllayMC/Allay) that aims to be small
 
 Install from one command line:
 
+Linux:
+
 ```bash
-WIP
+
+```
+
+Windows(PowerShell):
+
+```powershell
+Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AllayMC/AllayLauncher/refs/heads/main/scripts/install_windows.ps1").Content
 ```
 
 ## Commands
@@ -41,16 +49,16 @@ Available options:
 
 Start the server with specified memory limit:
 
-Windows(cmd):
-
-```bash
-allay -u -r -n -a '-Xms1G -Xmx4G'
-```
-
-Linux(bash):
+Linux:
 
 ```bash
 allay -u -r -n -a '\-Xms1G \-Xmx4G'
+```
+
+Windows(CMD):
+
+```cmd
+allay -u -r -n -a '-Xms1G -Xmx4G'
 ```
 
 Start the server, and will restart the server if server crashed:
