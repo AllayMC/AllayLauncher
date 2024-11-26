@@ -7,6 +7,7 @@ The launcher for [Allay](https://github.com/AllayMC/Allay) that aims to be small
 - [x] Detect java status
 - [x] Manage Allay
 - [x] Discover system proxy setting automatically
+- [ ] Arm64 architecture support
 
 ## Installation
 
@@ -36,7 +37,7 @@ Available options:
 - `-a` Pass arguments to java
 - `-d` Use deamon mode, which the launcher will restart the server after server stopped
 
-Start the server with specified maximum memory limit:
+Start the server with specified memory limit:
 
 Windows(cmd):
 ```bash
