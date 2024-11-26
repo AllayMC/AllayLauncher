@@ -7,6 +7,7 @@ The launcher for [Allay](https://github.com/AllayMC/Allay) that aims to be small
 - [x] Detect java status
 - [x] Manage Allay
 - [x] Discover system proxy setting automatically
+- [ ] Arm64 architecture support
 
 ## Installation
 
@@ -19,11 +20,13 @@ WIP
 ## Commands
 
 Start the server (will download the latest nightly version of allay if allay haven't been downloaded):
+
 ```bash
 allay
 ```
 
 This is equal to:
+
 ```bash
 allay -u -r -n
 ```
@@ -36,24 +39,28 @@ Available options:
 - `-a` Pass arguments to java
 - `-d` Use deamon mode, which the launcher will restart the server after server stopped
 
-Start the server with specified maximum memory limit:
+Start the server with specified memory limit:
 
 Windows(cmd):
+
 ```bash
 allay -u -r -n -a '-Xms1G -Xmx4G'
 ```
 
 Linux(bash):
+
 ```bash
 allay -u -r -n -a '\-Xms1G \-Xmx4G'
 ```
 
 Start the server, and will restart the server if server crashed:
+
 ```bash
 allay -u -r -n -d
 ```
 
 Start the server, but do not check for update:
+
 ```bash
 allay -r
 ```
