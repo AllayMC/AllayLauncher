@@ -13,22 +13,26 @@ jobs:
     strategy:
       matrix:
         mode: [release, debug]
-    runs-on: ubuntu-20.04 # for compatibility.
+        arch: [x86_64, arm64-v8a, mips64, mips64el]
+    runs-on: ubuntu-20.04 # for compatibility. todo: remove it
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup XMake
         uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: branch@dev
 
       - name: Restore xmake cache
         uses: actions/cache@v4
         with:
           path: |
             ~/.xmake
-          key: xmake-linux-${{ hashFiles('xmake.lua') }}
+            ~/.cache/zig
+          key: xmake-linux-${{ matrix.arch }}-${{ hashFiles('xmake.lua') }}
           restore-keys: |
-            xmake-linux-${{ matrix.mode }}-
+            xmake-linux-${{ matrix.arch }}-${{ matrix.mode }}-
 
       - name: Sync with repository
         run: |
@@ -36,12 +40,12 @@ jobs:
 
       - name: Build for host
         run: |
-          xmake f -a x86_64 -m ${{ matrix.mode }} -p linux -v -y
+          xmake f -a ${{ matrix.arch }} -m ${{ matrix.mode }} -p linux -v -y
           xmake -v -y
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: allay-launcher-linux-x86_64-${{ matrix.mode }}
+          name: allay-launcher-linux-${{ matrix.arch }}-${{ matrix.mode }}
           path: |
-            build/linux/x86_64/${{ matrix.mode }}
+            build/linux/${{ matrix.arch }}/${{ matrix.mode }}
