@@ -24,6 +24,10 @@ jobs:
         with:
           xmake-version: branch@dev
 
+      - uses: mlugg/setup-zig@v1
+        with:
+          version: 0.13.0
+
       - name: Restore xmake cache
         uses: actions/cache@v4
         with:
