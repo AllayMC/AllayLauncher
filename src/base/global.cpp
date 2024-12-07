@@ -18,9 +18,7 @@ std::shared_ptr<cpr::Session> CreateCprSession() {
         });
     }
 
-    // TODO: Should we use GetSharedPtrFromThis?
-    //       see: https://github.com/libcpr/cpr/issues/1145
-    return session->shared_from_this();
+    return session->GetSharedPtrFromThis();
 }
 
 } // namespace allay_launcher::global
