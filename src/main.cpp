@@ -67,15 +67,21 @@ auto parse_arguments(int argc, char* argv[]) {
         .flag()
         .store_into(args.m_deamon);
     
+    std::vector<std::string> raw_args;
     program.add_argument("-a", "--args")
         .help("Pass arguments to java")
-        .store_into(args.m_extra_vm_args);
+        .nargs(nargs_pattern::at_least_one)
+        .store_into(raw_args);
 
     program.parse_args(argc, argv);
 
     // clang-format on
 
     args.m_deamon = args.m_deamon && args.m_run;
+
+    for (const auto& arg : raw_args) {
+        args.m_extra_vm_args += "-" + arg + " ";
+    }
 
     return args;
 }
@@ -100,11 +106,6 @@ int main(int argc, char* argv[]) try {
     auto args = parse_arguments(argc, argv);
 
     AllayServer server{"."};
-
-    util::string::remove_prefix(args.m_extra_vm_args, "'");
-    util::string::remove_suffix(args.m_extra_vm_args, "'");
-    util::string::remove_prefix(args.m_extra_vm_args, "\"");
-    util::string::remove_suffix(args.m_extra_vm_args, "\"");
 
     server.set_vm_extra_arguments(args.m_extra_vm_args);
 
