@@ -1,13 +1,14 @@
 add_rules('mode.debug', 'mode.release')
 
-add_repositories('allaymc-repo https://github.com/AllayMC/xmake-repo.git')
-
-add_requires('openssl', {system = true})
+if is_plat('linux') then 
+    set_toolchains('zig')
+    add_requireconfs('**', { system = false })
+end
 
 add_requires('argparse      3.1')
 add_requires('spdlog        1.14.1')
 add_requires('nlohmann_json 3.11.3')
-add_requires('cpr           1.11.0')
+add_requires('cpr           1.11.1')
 
 target('allay')
     set_kind('binary')
@@ -28,15 +29,12 @@ target('allay')
         add_cxflags('/utf-8')
 
         remove_files('src/**_linux.*')
-    else 
-        add_linkgroups('cpr', 'curl', 'ssl', 'crypto', {static = true})
-        add_links('dl')
-
+    else
         remove_files('src/**_win32.*')
     end
 
     set_languages('c++17')
-    set_optimize('smallest')
+    set_optimize('fastest')
 
     set_pcxxheader('src/pch.h')
 
