@@ -4,10 +4,11 @@ The launcher for [Allay](https://github.com/AllayMC/Allay) that aims to be small
 
 ## Features
 
-- [x] Detect java status
-- [x] Manage Allay
-- [x] Discover system proxy setting automatically
-- [ ] Arm64 architecture support
+- [x] Automatically check java installation status.
+- [x] Manage allay server.
+- [x] Use a proxy to download updates.
+- [x] Broad platform support.
+- [ ] Managed java environment.
 
 ## Installation
 
@@ -27,7 +28,7 @@ Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/All
 
 ## Commands
 
-Start the server (will download the latest nightly version of allay if allay haven't been downloaded):
+Start the server (will download the latest version of allay if it is not installed):
 
 ```bash
 allay
@@ -36,41 +37,42 @@ allay
 This is equal to:
 
 ```bash
-allay -u -r -n
+allay --run --update --nightly
+```
+
+Allows concatenation of single-character arguments:
+
+```bash
+allay -run
 ```
 
 Available options:
 
-- `-u` Check for update before starting the server
-- `-r` Run allay server
-- `-n` Use nightly build
-- `-a` Pass arguments to java
-- `-d` Use deamon mode, which the launcher will restart the server after server stopped
+- `-r`, `--run` Run allay server
+- `-u`, `--update` Check for update before starting the server
+- `-n`, `--nightly` Use nightly build
+- `-d`, `--daemon` Use deamon mode, which the launcher will restart the server after server stopped
+- `-a`, `--args` Pass arguments to java
 
-Start the server with specified memory limit:
+Pass custom parameters to the JVM, such as memory limits:
 
-Linux:
-
-```bash
-allay -u -r -n -a '\-Xms1G \-Xmx4G'
-```
-
-Windows(CMD):
-
-```cmd
-allay -u -r -n -a '-Xms1G -Xmx4G'
-```
-
-Start the server, and will restart the server if server crashed:
+> [!IMPORTANT]
+> The "-" before the parameter will be automatically added.
 
 ```bash
-allay -u -r -n -d
+allay -run --args Xms1G Xmx4G
+```
+
+Start the server in daemon mode:
+
+```bash
+allay -rund
 ```
 
 Start the server, but do not check for update:
 
 ```bash
-allay -r
+allay --run
 ```
 
 ## License
