@@ -15,7 +15,7 @@ target('allay')
     add_files('src/**.cpp')
     add_includedirs('src')
     add_includedirs('build/config')
-    set_version("1.0.0-BETA")
+    set_version("1.0.0")
 
     add_packages(
         'argparse',
