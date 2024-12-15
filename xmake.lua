@@ -1,6 +1,6 @@
 add_rules('mode.debug', 'mode.release')
 
-if is_plat('linux') then 
+if is_plat('linux', 'macosx') then 
     set_toolchains('zig')
     add_requireconfs('**', { system = false })
 end
@@ -8,7 +8,9 @@ end
 add_requires('argparse      3.1')
 add_requires('spdlog        1.14.1')
 add_requires('nlohmann_json 3.11.3')
-add_requires('cpr           1.11.1')
+add_requires('cpr           1.11.1', {configs = {ssl = true}})
+
+add_requireconfs('cpr.libcurl', {configs = {openssl = true}})
 
 target('allay')
     set_kind('binary')
