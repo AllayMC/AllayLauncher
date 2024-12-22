@@ -30,7 +30,7 @@ auto parse_arguments(int argc, char* argv[]) {
             _args args;
             args.m_run         = true;
             args.m_update      = true;
-            args.m_use_nightly = true;
+            args.m_use_nightly = false;
             args.m_deamon      = false;
             return args;
         }
