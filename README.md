@@ -37,13 +37,13 @@ allay
 This is equal to:
 
 ```bash
-allay --run --update --nightly
+allay --run --update
 ```
 
 Allows concatenation of single-character arguments:
 
 ```bash
-allay -run
+allay -ru
 ```
 
 Available options:
@@ -60,13 +60,13 @@ Pass custom parameters to the JVM, such as memory limits:
 > The "-" before the parameter will be automatically added.
 
 ```bash
-allay -run --args Xms1G Xmx4G
+allay -ru --args Xms1G Xmx4G
 ```
 
 Start the server in daemon mode:
 
 ```bash
-allay -rund
+allay -rud
 ```
 
 Start the server, but do not check for update:
