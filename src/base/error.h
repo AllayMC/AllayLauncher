@@ -35,7 +35,7 @@ public:
 class ParserException : public BaseException {
 public:
     explicit ParserException(std::string_view raw_str, std::string_view message)
-    : BaseException(fmt::format("[exception.parser] (str: {}) {}")) {}
+    : BaseException(fmt::format("[exception.parser] (str: {}) {}", raw_str, message)) {}
 };
 
 class NeedUpdateException : public BaseException {
