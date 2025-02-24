@@ -5,7 +5,6 @@
 #include "config.h"
 
 #include "util/java.h"
-#include "util/string.h"
 
 #ifdef _WIN32
 #include "util/os.h" // set_console_cp_utf8
