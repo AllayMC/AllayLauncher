@@ -31,6 +31,7 @@ target('allay')
         add_links('winhttp.lib')
         add_cxflags('/utf-8')
 
+        add_files('assets/app.rc')
         remove_files('src/**_linux.*')
     else
         remove_files('src/**_win32.*')
