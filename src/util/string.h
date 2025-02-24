@@ -2,15 +2,15 @@
 
 namespace allay_launcher::util::string {
 
-AL_INLINE bool starts_with(const std::string& str, const std::string& prefix) {
+AL_INLINE bool starts_with(std::string_view str, std::string_view prefix) {
     return prefix.size() <= str.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 
-AL_INLINE bool ends_with(const std::string& str, const std::string& suffix) {
+AL_INLINE bool ends_with(std::string_view str, std::string_view suffix) {
     return suffix.size() <= str.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-AL_INLINE void remove_prefix(std::string& str, const std::string& prefix) {
+AL_INLINE void remove_prefix(std::string& str, std::string_view prefix) {
     if (str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0) {
         str.erase(0, prefix.size());
     }
@@ -35,13 +35,13 @@ AL_INLINE std::optional<int32_t> to_int32(std::string_view str) {
     return value;
 }
 
-AL_INLINE std::vector<std::string> split(std::string_view str, std::string_view delimiter) {
-    std::vector<std::string> tokens;
-    size_t                   start = 0, end = 0;
+AL_INLINE std::vector<std::string_view> split_nocopy(std::string_view str, std::string_view delim) {
+    std::vector<std::string_view> tokens;
+    size_t                        start = 0, end = 0;
 
-    while ((end = str.find(delimiter, start)) != std::string::npos) {
+    while ((end = str.find(delim, start)) != std::string::npos) {
         tokens.emplace_back(str.substr(start, end - start));
-        start = end + delimiter.length();
+        start = end + delim.length();
     }
 
     tokens.emplace_back(str.substr(start));
