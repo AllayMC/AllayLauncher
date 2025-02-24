@@ -5,25 +5,28 @@
 namespace allay_launcher {
 
 std::optional<Version> Version::parse(std::string_view str) {
-    auto tokens = util::string::split(str, ".");
-    if (tokens.size() > 3) {
+    // 0 -> major
+    // 1 -> minor
+    // 2 -> revision
+
+    auto extract = [&str]() {
+        std::array<int32_t, 3> res;
+        auto                   draft = util::string::split_nocopy(str, ".");
+        for (int i = 0; i < draft.size(); i++) {
+            if (i >= res.size()) break;
+            if (auto integer = util::string::to_int32(draft.at(i))) {
+                res.at(i) = *integer;
+            }
+        }
+        return res;
+    };
+
+    auto draft = extract();
+    if (draft.at(0) == 0) {
         return {};
     }
 
-    // major(require),minor,revision
-    std::vector<std::optional<int32_t>> version = {0, 0, 0};
-
-    auto vId = 0;
-    for (const auto& item : tokens) {
-        version[vId] = util::string::to_int32(tokens[vId]);
-        vId++;
-    }
-
-    if (!version[0]) return {};
-    auto ret = Version{*version[0], 0, 0};
-    if (version[1]) ret.m_minor = *version[1];
-    if (version[2]) ret.m_revision = *version[2];
-    return ret;
+    return Version{.m_major = draft.at(0), .m_minor = draft.at(1), .m_revision = draft.at(2)};
 }
 
 } // namespace allay_launcher
