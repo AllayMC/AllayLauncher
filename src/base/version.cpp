@@ -10,13 +10,13 @@ std::optional<Version> Version::parse(std::string_view str) {
     // 2 -> revision
 
     auto extract = [&str]() {
-        std::array<int32_t, 3> res;
+        std::array<int32_t, 3> res{0, 0, 0};
         auto                   draft = util::string::split_nocopy(str, ".");
         for (int i = 0; i < draft.size(); i++) {
             if (i >= res.size()) break;
             if (auto integer = util::string::to_int32(draft.at(i))) {
                 res.at(i) = *integer;
-            }
+            } else break;
         }
         return res;
     };

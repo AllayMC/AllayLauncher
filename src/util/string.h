@@ -1,5 +1,7 @@
 #pragma once
 
+#include <charconv>
+
 namespace allay_launcher::util::string {
 
 AL_INLINE bool starts_with(std::string_view str, std::string_view prefix) {
@@ -35,16 +37,14 @@ AL_INLINE void remove_suffix(std::string_view& str, std::string_view suffix) {
 }
 
 AL_INLINE std::optional<int32_t> to_int32(std::string_view str) {
-    char* str_end = nullptr;
-    errno         = 0;
+    int32_t result = 0;
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), result);
 
-    long value = std::strtol(str.data(), &str_end, 0);
-
-    if (str_end == str.data() || errno == ERANGE || *str_end != '\0') {
+    if (ec != std::errc()) {
         return {};
     }
 
-    return value;
+    return result;
 }
 
 AL_INLINE std::vector<std::string_view> split_nocopy(std::string_view str, std::string_view delim) {
