@@ -13,8 +13,8 @@ Version installed_version() {
     // so we need to add the suffix "2>&1" to redirect the output
     auto output = os::execute("java -version 2>&1");
 
-    auto lines             = split(output, "\n");
-    auto first_line_tokens = split(lines.at(0), " ");
+    auto lines             = split_nocopy(output, "\n");
+    auto first_line_tokens = split_nocopy(lines.at(0), " ");
 
     // openjdk version "21.0.4" 2024-07-16
     //                          ^ (optional)
@@ -23,8 +23,8 @@ Version installed_version() {
     }
 
     auto version_string = first_line_tokens.at(2);
-    string::remove_prefix(version_string, "\"");
-    string::remove_suffix(version_string, "\"");
+    remove_prefix(version_string, "\"");
+    remove_suffix(version_string, "\"");
 
     // openjdk version "1.8.0_432"
     if (auto underline_pos = version_string.find("_"); underline_pos != std::string::npos) {

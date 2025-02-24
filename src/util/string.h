@@ -16,9 +16,21 @@ AL_INLINE void remove_prefix(std::string& str, std::string_view prefix) {
     }
 }
 
-AL_INLINE void remove_suffix(std::string& str, const std::string& suffix) {
+AL_INLINE void remove_prefix(std::string_view& str, std::string_view prefix) {
+    if (str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0) {
+        str.remove_prefix(prefix.size());
+    }
+}
+
+AL_INLINE void remove_suffix(std::string& str, std::string_view suffix) {
     if (str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0) {
         str.erase(str.size() - suffix.size());
+    }
+}
+
+AL_INLINE void remove_suffix(std::string_view& str, std::string_view suffix) {
+    if (str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0) {
+        str.remove_suffix(suffix.size());
     }
 }
 
