@@ -26,7 +26,7 @@ std::optional<Version> Version::parse(std::string_view str) {
         return {};
     }
 
-    return Version{.m_major = draft.at(0), .m_minor = draft.at(1), .m_revision = draft.at(2)};
+    return Version{draft.at(0), draft.at(1), draft.at(2)};
 }
 
 } // namespace allay_launcher
