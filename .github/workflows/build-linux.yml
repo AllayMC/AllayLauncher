@@ -1,4 +1,4 @@
-name: Build (Linux)
+name: Build & Test (Linux)
 
 on:
   push:
@@ -36,11 +36,7 @@ jobs:
             ~/.cache/zig
           key: xmake-linux-${{ matrix.arch }}-${{ hashFiles('xmake.lua') }}
           restore-keys: |
-            xmake-linux-${{ matrix.arch }}-${{ matrix.mode }}-
-
-      - name: Sync with repository
-        run: |
-          xmake repo -u
+            xmake-linux-${{ matrix.arch }}-
 
       - name: Build for host
         run: |
@@ -57,5 +53,4 @@ jobs:
       - name: Run tests
         if: matrix.arch == 'x86_64'
         run: |
-          xmake build googletest
-          xmake run googletest
+          xmake build googletest && xmake run googletest
