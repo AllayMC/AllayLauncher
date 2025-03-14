@@ -1,4 +1,4 @@
-name: Build (Windows)
+name: Build & Test (Windows)
 
 on:
   push:
@@ -32,10 +32,6 @@ jobs:
 
       - name: Setup MSVC
         uses: microsoft/setup-msbuild@v2
-
-      - name: Sync with repository
-        run: |
-          xmake repo -u
 
       - name: Configure
         run: |
