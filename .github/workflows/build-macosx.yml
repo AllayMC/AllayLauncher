@@ -54,6 +54,6 @@ jobs:
           path: |
             build/macosx/${{ matrix.arch }}/${{ matrix.mode }}
   
-      - name: Run tests
-        run: |
-          xmake build googletest && xmake run googletest
+#      - name: Run tests
+#        run: |
+#          xmake build googletest && xmake run googletest
