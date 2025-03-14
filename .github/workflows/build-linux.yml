@@ -55,7 +55,7 @@ jobs:
             build/linux/${{ matrix.arch }}/${{ matrix.mode }}
 
       - name: Run tests
-        if: ${{ matrix.arch }} === "x86_64"
+        if: matrix.arch == 'x86_64'
         run: |
           xmake build googletest
           xmake run googletest
