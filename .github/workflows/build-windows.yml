@@ -45,13 +45,13 @@ jobs:
         run: |
           xmake -v -y
 
-      - name: Run tests
-        run: |
-          xmake run googletest
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: allay-launcher-windows-x64-${{ matrix.mode }}
           path: |
             build/windows/x64/${{ matrix.mode }}
+
+      - name: Run tests
+        run: |
+          xmake build googletest && xmake run googletest
