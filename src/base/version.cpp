@@ -22,7 +22,7 @@ std::optional<Version> Version::parse(std::string_view str) {
     };
 
     auto draft = extract();
-    if (draft.at(0) == 0) {
+    if ((draft.at(0) | draft.at(1) | draft.at(2)) == 0) {
         return {};
     }
 

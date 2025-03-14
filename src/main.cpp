@@ -13,7 +13,7 @@
 using namespace allay_launcher;
 
 void setup_logger() {
-#ifdef DEBUG
+#ifdef AL_DEBUG
     logging::set_level(logging::level::debug);
 #endif
     logging::set_pattern("[%^%l%$] %v");
