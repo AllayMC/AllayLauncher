@@ -47,7 +47,7 @@ jobs:
 
       - name: Run tests
         run: |
-          xmake test -vD
+          xmake run googletest
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
