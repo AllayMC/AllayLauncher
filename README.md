@@ -26,6 +26,12 @@ Windows(PowerShell):
 Invoke-Expression (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AllayMC/AllayLauncher/refs/heads/main/scripts/install_windows.ps1").Content
 ```
 
+MacOS:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/AllayMC/AllayLauncher/refs/heads/main/scripts/install_macos.sh | bash
+```
+
 ## Commands
 
 Start the server (will download the latest version of allay if it is not installed):
