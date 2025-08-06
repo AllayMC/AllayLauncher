@@ -83,6 +83,6 @@ allay --run
 
 ## License
 
-Copyright **:copyright: 2023-2024 AllayMC**, all rights reserved.
+Copyright **:copyright: 2023-2024 AllayMC**.
 
 If not otherwise specified, project content is open source under the LGPL-3.0 license.
