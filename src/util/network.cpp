@@ -27,7 +27,7 @@ void download(std::string_view download_url, std::string_view save_path) {
     terminal::Spinner()
         .printer([&](std::string_view spinner, std::string_view hint) {
             fmt::print(
-                "\r  {} fetching from ... {}", 
+                "\r  {} fetching files from ... {}", 
                 spinner, 
                 fmt::styled(host, fg(rgb(theme::EMPHASIS)) | fmt::emphasis::bold)
             );

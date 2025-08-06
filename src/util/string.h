@@ -12,28 +12,36 @@ AL_INLINE bool ends_with(std::string_view str, std::string_view suffix) {
     return suffix.size() <= str.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-AL_INLINE void remove_prefix(std::string& str, std::string_view prefix) {
+AL_INLINE bool remove_prefix(std::string& str, std::string_view prefix) {
     if (str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0) {
         str.erase(0, prefix.size());
+        return true;
     }
+    return false;
 }
 
-AL_INLINE void remove_prefix(std::string_view& str, std::string_view prefix) {
+AL_INLINE bool remove_prefix(std::string_view& str, std::string_view prefix) {
     if (str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0) {
         str.remove_prefix(prefix.size());
+        return true;
     }
+    return false;
 }
 
-AL_INLINE void remove_suffix(std::string& str, std::string_view suffix) {
+AL_INLINE bool remove_suffix(std::string& str, std::string_view suffix) {
     if (str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0) {
         str.erase(str.size() - suffix.size());
+        return true;
     }
+    return false;
 }
 
-AL_INLINE void remove_suffix(std::string_view& str, std::string_view suffix) {
+AL_INLINE bool remove_suffix(std::string_view& str, std::string_view suffix) {
     if (str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0) {
         str.remove_suffix(suffix.size());
+        return true;
     }
+    return false;
 }
 
 AL_INLINE std::optional<int32_t> to_int32(std::string_view str) {
@@ -68,6 +76,14 @@ AL_INLINE std::string_view extract_host(std::string_view url) {
         return url.substr(0, pos);
     }
     return url;
+}
+
+AL_INLINE std::string uchar_array_to_hex(unsigned char data[], size_t len) {
+    std::ostringstream oss;
+    for (unsigned int i = 0; i < len; ++i) {
+        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(data[i]);
+    }
+    return oss.str();
 }
 
 // from: https://stackoverflow.com/questions/2111667/compile-time-string-hashing

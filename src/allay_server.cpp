@@ -1,5 +1,6 @@
 #include "allay_server.h"
 
+#include "util/file.h"
 #include "util/network.h"
 #include "util/os.h"
 #include "util/string.h"
@@ -65,11 +66,19 @@ void AllayServer::update(bool use_nightly) {
 
     util::network::download(asset.m_browser_download_url, new_jar_name);
 
-    // Write the new allay jar name after making sure the file is downloaded properly
+    if (auto digest = asset.m_digest; util::string::remove_prefix(digest, "sha256:")) {
+        if (util::file::calc_sha256(new_jar_name) != digest) {
+            throw ChecksumException("the file may have been corrupted during transfer", new_jar_name);
+        }
+    } else {
+        throw ChecksumException("please report an issue", new_jar_name);
+    }
+
+    // Write the new allay jar name after making sure the file is downloaded properly.
     _current_jar_name(new_jar_name);
     logging::info("Successfully updated to {}.", format(fmt::emphasis::bold, guessed_version));
 
-    // Delete the old jar file
+    // Delete the old jar file.
     std::filesystem::remove(old_jar_name);
 }
 

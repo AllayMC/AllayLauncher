@@ -17,6 +17,7 @@ public:
 
         std::string m_name;
         std::string m_browser_download_url;
+        std::string m_digest;
     };
 
     using asset_t      = Asset;

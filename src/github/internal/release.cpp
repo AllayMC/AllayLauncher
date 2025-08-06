@@ -20,6 +20,7 @@ Release::Asset Release::Asset::from_json(const nlohmann::json& data) try {
     Release::Asset asset;
     asset.m_name                 = data["name"];
     asset.m_browser_download_url = data["browser_download_url"];
+    asset.m_digest               = data["digest"];
     return asset;
 } catch (const json::exception& e) {
     throw JsonException(e.what(), data.dump());

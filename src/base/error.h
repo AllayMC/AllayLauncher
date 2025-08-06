@@ -56,7 +56,21 @@ public:
 
 class NothingException : public BaseException {
 public:
-    explicit NothingException() : BaseException("[exception.nothing] we can't find anything.") {}
+    explicit NothingException() : BaseException("[exception.nothing] We can't find anything.") {}
+};
+
+class CryptoException : public BaseException {
+public:
+    explicit CryptoException(std::string_view method)
+    : BaseException(fmt::format("[exception.openssl] An exception occurred while executing {}", method)) {}
+};
+
+class ChecksumException : public BaseException {
+public:
+    explicit ChecksumException(std::string_view reason, const std::filesystem::path& path)
+    : BaseException(fmt::format("[exception.integrity] Unable to verify integrity, {}.", reason)) {
+        std::filesystem::remove(path);
+    }
 };
 
 } // namespace allay_launcher

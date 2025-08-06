@@ -12,6 +12,7 @@ add_requires('argparse      3.2')
 add_requires('spdlog        1.15.3')
 add_requires('nlohmann_json 3.12.0')
 add_requires('cpr           1.11.2')
+add_requires('openssl       1.1.1-w')
 add_requires('gtest         1.17.0')
 
 add_files('src/**.cpp')
@@ -23,7 +24,8 @@ add_packages(
     'argparse',
     'spdlog',
     'nlohmann_json',
-    'cpr'
+    'cpr',
+    'openssl'
 )
 
 set_version('1.1.0')
