@@ -14,6 +14,8 @@ std::string environment(std::string_view var);
 
 std::optional<SystemProxy> system_proxy_configuration();
 
+bool is_legacy_windows();
+
 #ifdef _WIN32
 void set_console_cp_utf8();
 #endif

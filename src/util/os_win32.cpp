@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <winhttp.h>
 
+#include <VersionHelpers.h>
+
 namespace allay_launcher::util::os {
 
 std::optional<SystemProxy> system_proxy_configuration() {
@@ -26,5 +28,7 @@ void set_console_cp_utf8() {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 }
+
+bool is_legacy_windows() { return !IsWindows10OrGreater(); }
 
 } // namespace allay_launcher::util::os

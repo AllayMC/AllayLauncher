@@ -61,6 +61,15 @@ AL_INLINE std::vector<std::string_view> split_nocopy(std::string_view str, std::
     return tokens;
 }
 
+AL_INLINE std::string_view extract_host(std::string_view url) {
+    remove_prefix(url, "http://");
+    remove_prefix(url, "https://");
+    if (auto pos = url.find("/"); pos != std::string_view::npos) {
+        return url.substr(0, pos);
+    }
+    return url;
+}
+
 // from: https://stackoverflow.com/questions/2111667/compile-time-string-hashing
 constexpr unsigned H(char const* input) {
     return *input ? static_cast<unsigned int>(*input) + 33 * H(input + 1) : 5381;

@@ -16,4 +16,6 @@ std::optional<SystemProxy> system_proxy_configuration() {
     return {};
 }
 
+bool is_legacy_windows() { return false; }
+
 } // namespace allay_launcher::util::os

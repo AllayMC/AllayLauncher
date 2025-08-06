@@ -1,6 +1,6 @@
 #include "util/os.h"
 
-#include "internal/popen.h"
+#include "util/internal/popen.h"
 
 namespace allay_launcher::util::os {
 
