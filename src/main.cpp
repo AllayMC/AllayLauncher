@@ -14,10 +14,21 @@
 using namespace allay_launcher;
 
 void setup_logger() {
+    auto formatter = std::make_unique<logging::pattern_formatter>();
+    formatter->add_flag<UppercaseLevelFormatter>('L');
+    formatter->set_pattern("[%^%T %L%$] %v");
+
+    auto sink = std::make_shared<logging::sinks::stdout_color_sink_mt>();
+    sink->set_formatter(std::move(formatter));
+    sink->set_color(logging::level::info, sink->cyan);
+    sink->set_color(logging::level::warn, sink->cyan);
+    sink->set_color(logging::level::err, sink->cyan);
 #ifdef AL_DEBUG
-    logging::set_level(logging::level::debug);
+    sink->set_level(logging::level::debug);
 #endif
-    logging::set_pattern("[%^%l%$] %v");
+
+    auto logger = std::make_shared<logging::logger>("logging", sink);
+    logging::set_default_logger(logger);
 }
 
 auto parse_arguments(int argc, char* argv[]) {
