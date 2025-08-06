@@ -1,7 +1,9 @@
-#include "java.h"
+#include "util/java.h"
 
 #include "util/os.h"
 #include "util/string.h"
+
+#include "theme.h"
 
 namespace allay_launcher::util::java {
 
@@ -45,8 +47,11 @@ bool check_java() try {
 
     Version min_required_version{21, 0, 0};
     if (version < min_required_version) {
-        logging::error("Unsupported java version: {}", version);
-        logging::error("Please update your java to 21 or higher.");
+        logging::error(
+            "Unsupported java version: {}",
+            format(fg(fmt::rgb(theme::FAILED)) | fmt::emphasis::bold, "{}", version)
+        );
+        logging::error("Please update your java to {} or higher.", min_required_version.m_major);
     } else {
         is_java_ok = true;
     }
@@ -56,7 +61,10 @@ bool check_java() try {
         return false;
     }
 
-    logging::info("Detected java version: {}", format(fg(fmt::color::green), "{}", version));
+    logging::info(
+        "Detected java version: {}",
+        format(fg(fmt::rgb(theme::SUCCEED)) | fmt::emphasis::bold, "{}", version)
+    );
     return is_java_ok;
 
 } catch (const ParserException& e) {

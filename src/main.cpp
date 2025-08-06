@@ -3,6 +3,7 @@
 #include "allay_server.h"
 
 #include "config.h"
+#include "theme.h"
 
 #include "util/java.h"
 
@@ -22,7 +23,7 @@ void setup_logger() {
 auto parse_arguments(int argc, char* argv[]) {
     using namespace argparse;
 
-    ArgumentParser program("allay", ALLAY_LAUNCHER_VERSION);
+    ArgumentParser program("allay", BUILD_VERSION);
 
     struct _args {
         static _args default_value() {
@@ -93,9 +94,9 @@ int main(int argc, char* argv[]) try {
     setup_logger();
 
     logging::info(
-        "Allay launcher {} ({}).",
-        format(fg(fmt::color::green), ALLAY_LAUNCHER_VERSION),
-        format(fg(fmt::color::yellow), GIT_COMMIT)
+        "Allay Launcher {} ({})",
+        format(fg(fmt::rgb(theme::SUCCEED)) | fmt::emphasis::bold, BUILD_VERSION),
+        format(fg(fmt::rgb(theme::ATTENTION)), "git." BUILD_COMMIT_ID)
     );
 
     if (!util::java::check_java()) {
