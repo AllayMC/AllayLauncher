@@ -14,7 +14,7 @@ jobs:
       matrix:
         mode: [release, debug]
         arch: [x86_64, arm64-v8a, mips64, mips64el]
-    runs-on: ubuntu-20.04 # for compatibility. todo: remove it
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
