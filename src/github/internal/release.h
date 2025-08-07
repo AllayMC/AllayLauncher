@@ -15,9 +15,9 @@ public:
          */
         static Asset from_json(const nlohmann::json& data);
 
-        std::string m_name;
-        std::string m_browser_download_url;
-        std::string m_digest;
+        std::string                m_name;
+        std::string                m_browser_download_url;
+        std::optional<std::string> m_digest;
     };
 
     using asset_t      = Asset;

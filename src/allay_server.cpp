@@ -66,7 +66,7 @@ void AllayServer::update(bool use_nightly) {
 
     util::network::download(asset.m_browser_download_url, new_jar_name);
 
-    if (auto digest = asset.m_digest; util::string::remove_prefix(digest, "sha256:")) {
+    if (auto digest = asset.m_digest; digest && util::string::remove_prefix(*digest, "sha256:")) {
         if (util::file::calc_sha256(new_jar_name) != digest) {
             throw ChecksumException("the file may have been corrupted during transfer", new_jar_name);
         }
