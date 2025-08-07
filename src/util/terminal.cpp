@@ -63,17 +63,21 @@ void Spinner::run() {
     if (m_running) return;
     m_running = true;
     m_thread  = std::thread([this]() {
-        size_t index = 0;
-        while (m_running) {
-            auto c_index = index++ % CHARSET->size();
+        try {
+            size_t index = 0;
+            while (m_running) {
+                auto c_index = index++ % CHARSET->size();
 
-            // CHARSET[0] is the completion mark.
-            if (c_index == 0) c_index = 1;
+                // CHARSET[0] is the completion mark.
+                if (c_index == 0) c_index = 1;
 
-            auto& spinner = (*CHARSET)[c_index];
-            m_printer(spinner, m_hint);
-            std::cout.flush();
-            std::this_thread::sleep_for(std::chrono::milliseconds(m_interval));
+                auto& spinner = (*CHARSET)[c_index];
+                m_printer(spinner, m_hint);
+                std::cout.flush();
+                std::this_thread::sleep_for(std::chrono::milliseconds(m_interval));
+            }
+        } catch (const std::exception& e) {
+            logging::error(e.what());
         }
     });
     m_scope();
