@@ -20,9 +20,16 @@ void setup_logger() {
 
     auto sink = std::make_shared<logging::sinks::stdout_color_sink_mt>();
     sink->set_formatter(std::move(formatter));
-    sink->set_color(logging::level::info, sink->cyan);
-    sink->set_color(logging::level::warn, sink->cyan);
-    sink->set_color(logging::level::err, sink->cyan);
+
+#ifndef _WIN32
+    auto cyan = sink->cyan;
+#else
+    auto cyan = FOREGROUND_GREEN | FOREGROUND_BLUE; // cyan
+#endif
+
+    sink->set_color(logging::level::info, cyan);
+    sink->set_color(logging::level::warn, cyan);
+    sink->set_color(logging::level::err, cyan);
 #ifdef AL_DEBUG
     sink->set_level(logging::level::debug);
 #endif

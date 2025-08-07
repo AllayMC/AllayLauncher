@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <winhttp.h>
 
-#include <VersionHelpers.h>
+#include <versionhelpers.h>
 
 namespace allay_launcher::util::os {
 

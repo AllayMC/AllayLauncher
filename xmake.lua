@@ -30,9 +30,9 @@ add_packages(
 
 set_version('1.1.0')
 
-if is_plat('windows') then
-    add_links('winhttp.lib')
-    add_cxflags('/utf-8')
+if is_plat('windows', 'mingw') then
+    add_links('winhttp')
+    add_cxflags('/utf-8', {tools = {'clang_cl', 'cl'}})
 
     add_files('assets/app.rc')
     remove_files('src/**_linux.*')
