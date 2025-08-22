@@ -4,6 +4,8 @@
 
 namespace allay_launcher::util::java {
 
+Version installed_version(std::string_view cmdoutput);
+
 /* @Throwable ParserException
  * @Throwable CommandExecutionException
  */

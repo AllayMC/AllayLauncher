@@ -7,21 +7,16 @@
 
 namespace allay_launcher::util::java {
 
-Version installed_version() {
+Version installed_version(std::string_view cmdoutput) {
     using namespace string;
 
-    // Do not use "java --version", which is not supported on java-1.8
-    // The output of this command will be written into error stream
-    // so we need to add the suffix "2>&1" to redirect the output
-    auto output = os::execute("java -version 2>&1");
-
-    auto lines             = split_nocopy(output, "\n");
+    auto lines             = split_nocopy(cmdoutput, "\n");
     auto first_line_tokens = split_nocopy(lines.at(0), " ");
 
     // openjdk version "21.0.4" 2024-07-16
     //                          ^ (optional)
     if (first_line_tokens.size() < 3) {
-        throw ParserException(output, "unable to parse java version.");
+        throw ParserException(cmdoutput, "unable to parse java version.");
     }
 
     auto version_string = first_line_tokens.at(2);
@@ -38,6 +33,13 @@ Version installed_version() {
     } else {
         throw ParserException(version_string, "unable to parse version string.");
     }
+}
+
+Version installed_version() {
+    // Do not use "java --version", which is not supported on java-1.8
+    // The output of this command will be written into error stream
+    // so we need to add the suffix "2>&1" to redirect the output
+    return installed_version(os::execute("java -version 2>&1"));
 }
 
 bool check_java() try {
