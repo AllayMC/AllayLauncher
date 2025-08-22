@@ -8,7 +8,7 @@
 #include "util/java.h"
 
 #ifdef _WIN32
-#include "util/os.h" // set_console_cp_utf8
+#include "util/os.h"
 #endif
 
 using namespace allay_launcher;
@@ -107,6 +107,8 @@ auto parse_arguments(int argc, char* argv[]) {
 int main(int argc, char* argv[]) try {
 #ifdef _WIN32
     util::os::set_console_cp_utf8();
+    // Make it able to use of ANSI escape codes in the console
+    util::os::enable_virtual_terminal_processing();
 #endif
 
     setup_logger();

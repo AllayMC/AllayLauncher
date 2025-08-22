@@ -31,4 +31,17 @@ void set_console_cp_utf8() {
 
 bool is_legacy_windows() { return !IsWindows10OrGreater(); }
 
+void enable_virtual_terminal_processing() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) {
+        return;
+    }
+
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode)) {
+        return;
+    }
+
+    SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+}
 } // namespace allay_launcher::util::os

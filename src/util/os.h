@@ -18,6 +18,8 @@ bool is_legacy_windows();
 
 #ifdef _WIN32
 void set_console_cp_utf8();
+
+void enable_virtual_terminal_processing();
 #endif
 
 } // namespace allay_launcher::util::os
