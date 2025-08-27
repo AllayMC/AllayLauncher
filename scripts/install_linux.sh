@@ -3,7 +3,7 @@ URL=""
 
 case "$ARCH" in
     "x86_64")
-        URL="https://github.com/AllayMC/AllayLauncher/releases/latest/download/allay-launcher-linux-x64-release"
+        URL="https://github.com/AllayMC/AllayLauncher/releases/latest/download/allay-launcher-linux-x86_64-release"
         ;;
     "aarch64")
         URL="https://github.com/AllayMC/AllayLauncher/releases/latest/download/allay-launcher-linux-arm64-v8a-release"
